@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf.ldap;
+package org.dcm4chee.archive.conf.ldapimpl;
 
 import java.security.cert.CertificateException;
 import java.util.ArrayList;

@@ -36,41 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf.ldap;
+package org.dcm4chee.archive.store;
 
-import java.util.Properties;
-
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.conf.api.DicomConfiguration;
-import org.dcm4che.conf.ldap.LdapDicomConfiguration;
-import org.dcm4che.conf.ldap.audit.LdapAuditLoggerConfiguration;
-import org.dcm4che.conf.ldap.audit.LdapAuditRecordRepositoryConfiguration;
-import org.dcm4che.conf.ldap.hl7.LdapHL7Configuration;
-// import org.dcm4che.conf.ldap.imageio.LdapImageReaderConfiguration;
-// import org.dcm4che.conf.ldap.imageio.LdapImageWriterConfiguration;
+import org.dcm4che.net.service.BasicCStoreSCP;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public class LdapConfigurationFactory {
+public class CStoreSCP extends BasicCStoreSCP {
 
-    public static DicomConfiguration createDicomConfiguration(Properties env)
-            throws ConfigurationException {
-        LdapDicomConfiguration ldapConfig = new LdapDicomConfiguration(env);
-        LdapHL7Configuration hl7Config = new LdapHL7Configuration();
-        ldapConfig.addDicomConfigurationExtension(hl7Config);
-        LdapArchiveConfiguration arcConfig = new LdapArchiveConfiguration();
-        ldapConfig.addDicomConfigurationExtension(arcConfig);
-        hl7Config.addHL7ConfigurationExtension(arcConfig);
-        ldapConfig.addDicomConfigurationExtension(
-                new LdapAuditLoggerConfiguration());
-        ldapConfig.addDicomConfigurationExtension(
-                new LdapAuditRecordRepositoryConfiguration());
-//        ldapConfig.addDicomConfigurationExtension(
-//                new LdapImageReaderConfiguration());
-//        ldapConfig.addDicomConfigurationExtension(
-//                new LdapImageWriterConfiguration());
-        return ldapConfig;
-    }
 }

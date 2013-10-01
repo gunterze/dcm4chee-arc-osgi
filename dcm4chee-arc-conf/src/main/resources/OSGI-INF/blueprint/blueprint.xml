@@ -8,7 +8,7 @@
         ref="ldapConf" />
 
     <bean
-        class="org.dcm4chee.archive.conf.ldap.LdapConfigurationFactory"
+        class="org.dcm4chee.archive.conf.ldapimpl.LdapConfigurationFactory"
         id="ldapConf"
         activation="eager"
         factory-method="createDicomConfiguration">

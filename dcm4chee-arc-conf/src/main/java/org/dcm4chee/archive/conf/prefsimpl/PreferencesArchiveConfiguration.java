@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf.prefs;
+package org.dcm4chee.archive.conf.prefsimpl;
 
 import java.security.cert.CertificateException;
 import java.util.Arrays;

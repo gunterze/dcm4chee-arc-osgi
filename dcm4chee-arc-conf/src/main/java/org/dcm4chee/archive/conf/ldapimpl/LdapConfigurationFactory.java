@@ -36,41 +36,41 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf.prefs;
+package org.dcm4chee.archive.conf.ldapimpl;
 
 import java.util.Properties;
 
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
-import org.dcm4che.conf.prefs.PreferencesDicomConfiguration;
-import org.dcm4che.conf.prefs.audit.PreferencesAuditLoggerConfiguration;
-import org.dcm4che.conf.prefs.audit.PreferencesAuditRecordRepositoryConfiguration;
-import org.dcm4che.conf.prefs.hl7.PreferencesHL7Configuration;
-//import org.dcm4che.conf.prefs.imageio.PreferencesImageReaderConfiguration;
-//import org.dcm4che.conf.prefs.imageio.PreferencesImageWriterConfiguration;
+import org.dcm4che.conf.ldap.LdapDicomConfiguration;
+import org.dcm4che.conf.ldap.audit.LdapAuditLoggerConfiguration;
+import org.dcm4che.conf.ldap.audit.LdapAuditRecordRepositoryConfiguration;
+import org.dcm4che.conf.ldap.hl7.LdapHL7Configuration;
+// import org.dcm4che.conf.ldap.imageio.LdapImageReaderConfiguration;
+// import org.dcm4che.conf.ldap.imageio.LdapImageWriterConfiguration;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public class PreferencesConfigurationFactory {
+public class LdapConfigurationFactory {
 
     public static DicomConfiguration createDicomConfiguration(Properties env)
             throws ConfigurationException {
-        PreferencesDicomConfiguration prefsConfig = new PreferencesDicomConfiguration();
-        PreferencesHL7Configuration hl7Config = new PreferencesHL7Configuration();
-        prefsConfig.addDicomConfigurationExtension(hl7Config);
-        PreferencesArchiveConfiguration arcConfig = new PreferencesArchiveConfiguration();
-        prefsConfig.addDicomConfigurationExtension(arcConfig);
+        LdapDicomConfiguration ldapConfig = new LdapDicomConfiguration(env);
+        LdapHL7Configuration hl7Config = new LdapHL7Configuration();
+        ldapConfig.addDicomConfigurationExtension(hl7Config);
+        LdapArchiveConfiguration arcConfig = new LdapArchiveConfiguration();
+        ldapConfig.addDicomConfigurationExtension(arcConfig);
         hl7Config.addHL7ConfigurationExtension(arcConfig);
-        prefsConfig.addDicomConfigurationExtension(
-                new PreferencesAuditLoggerConfiguration());
-        prefsConfig.addDicomConfigurationExtension(
-                new PreferencesAuditRecordRepositoryConfiguration());
-//        prefsConfig.addDicomConfigurationExtension(
-//                new PreferencesImageReaderConfiguration());
-//        prefsConfig.addDicomConfigurationExtension(
-//                new PreferencesImageWriterConfiguration());
-        return prefsConfig;
+        ldapConfig.addDicomConfigurationExtension(
+                new LdapAuditLoggerConfiguration());
+        ldapConfig.addDicomConfigurationExtension(
+                new LdapAuditRecordRepositoryConfiguration());
+//        ldapConfig.addDicomConfigurationExtension(
+//                new LdapImageReaderConfiguration());
+//        ldapConfig.addDicomConfigurationExtension(
+//                new LdapImageWriterConfiguration());
+        return ldapConfig;
     }
 }

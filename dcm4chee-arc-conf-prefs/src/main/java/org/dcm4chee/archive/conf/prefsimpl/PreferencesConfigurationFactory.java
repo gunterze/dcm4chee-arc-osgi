@@ -55,7 +55,7 @@ import org.dcm4che.conf.prefs.hl7.PreferencesHL7Configuration;
  */
 public class PreferencesConfigurationFactory {
 
-    public static DicomConfiguration createDicomConfiguration(Properties env)
+    public static DicomConfiguration createDicomConfiguration()
             throws ConfigurationException {
         PreferencesDicomConfiguration prefsConfig = new PreferencesDicomConfiguration();
         PreferencesHL7Configuration hl7Config = new PreferencesHL7Configuration();

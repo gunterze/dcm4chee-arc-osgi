@@ -5,11 +5,11 @@
     <service
         id="dicomConfiguration"
         interface="org.dcm4che.conf.api.DicomConfiguration"
-        ref="ldapConf" />
+        ref="prefsConf" />
 
     <bean
         class="org.dcm4chee.archive.conf.prefsimpl.PreferencesConfigurationFactory"
-        id="prefsimpl"
+        id="prefsConf"
         activation="eager"
         factory-method="createDicomConfiguration">
     </bean>

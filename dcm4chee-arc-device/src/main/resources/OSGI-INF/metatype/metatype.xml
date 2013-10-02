@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData
+  xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.osgi.org/xmlns/metadata/v1.1.0 
+    http://www.osgi.org/xmlns/metatype/v1.1.0/metatype.xsd">
+
+  <OCD
+    description="dcm4che Device configuration"
+    name="dcm4che Device configuration"
+    id="org.dcm4chee.archive.device">
+
+    <AD
+      id=".transient.serial.id"
+      type="String"
+      default="0"
+      name=".transient.serial.id"
+      description="Set to 0" />
+
+    <AD
+      id="device-name"
+      type="String"
+      default="ECHOSCP"
+      name="device-name"
+      description="DICOM Device Name" />
+  </OCD>
+
+  <Designate pid="org.dcm4chee.archive.device">
+      <Object  ocdref="org.dcm4chee.archive.device"/>
+  </Designate>
+
+</metatype:MetaData>

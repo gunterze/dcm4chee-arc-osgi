@@ -51,26 +51,27 @@ import org.dcm4che.conf.ldap.hl7.LdapHL7Configuration;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
+ * 
  */
 public class LdapConfigurationFactory {
 
     public static DicomConfiguration createDicomConfiguration(Properties env)
             throws ConfigurationException {
+        
         LdapDicomConfiguration ldapConfig = new LdapDicomConfiguration(env);
         LdapHL7Configuration hl7Config = new LdapHL7Configuration();
         ldapConfig.addDicomConfigurationExtension(hl7Config);
         LdapArchiveConfiguration arcConfig = new LdapArchiveConfiguration();
         ldapConfig.addDicomConfigurationExtension(arcConfig);
         hl7Config.addHL7ConfigurationExtension(arcConfig);
-        ldapConfig.addDicomConfigurationExtension(
-                new LdapAuditLoggerConfiguration());
-        ldapConfig.addDicomConfigurationExtension(
-                new LdapAuditRecordRepositoryConfiguration());
-//        ldapConfig.addDicomConfigurationExtension(
-//                new LdapImageReaderConfiguration());
-//        ldapConfig.addDicomConfigurationExtension(
-//                new LdapImageWriterConfiguration());
+        ldapConfig
+                .addDicomConfigurationExtension(new LdapAuditLoggerConfiguration());
+        ldapConfig
+                .addDicomConfigurationExtension(new LdapAuditRecordRepositoryConfiguration());
+        // ldapConfig.addDicomConfigurationExtension(
+        // new LdapImageReaderConfiguration());
+        // ldapConfig.addDicomConfigurationExtension(
+        // new LdapImageWriterConfiguration());
         return ldapConfig;
     }
 }

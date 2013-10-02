@@ -144,6 +144,8 @@
     <module>dcm4chee-arc-conf</module>
     <module>dcm4chee-arc-device</module>
     <module>dcm4chee-arc-store</module>
+    <module>dcm4chee-arc-conf-ldap</module>
+    <module>dcm4chee-arc-conf-prefs</module>
   </modules>
   <build>
     <pluginManagement>

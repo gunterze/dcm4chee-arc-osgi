@@ -1,0 +1,25 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <service
+        id="storeService"
+        interface="org.dcm4che.net.DimseRQHandler"
+        ref="storeServiceImpl" />
+
+    <bean
+        class="org.dcm4chee.archive.store.impl.CStoreSCP"
+        id="storeServiceImpl"
+        activation="eager"
+        init-method="init"
+        destroy-method="destroy">
+        <property
+            name="archiveService"
+            ref="archiveService" />
+    </bean>
+
+    <reference
+        id="archiveService"
+        interface="org.dcm4chee.archive.ArchiveService" />
+
+</blueprint>

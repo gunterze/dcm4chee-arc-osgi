@@ -36,14 +36,39 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.conf.prefs.impl;
 
-import org.dcm4che.net.service.BasicCStoreSCP;
+import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.conf.api.DicomConfiguration;
+import org.dcm4che.conf.prefs.PreferencesDicomConfiguration;
+import org.dcm4che.conf.prefs.audit.PreferencesAuditLoggerConfiguration;
+import org.dcm4che.conf.prefs.audit.PreferencesAuditRecordRepositoryConfiguration;
+import org.dcm4che.conf.prefs.hl7.PreferencesHL7Configuration;
+import org.dcm4che.conf.prefs.imageio.PreferencesImageReaderConfiguration;
+import org.dcm4che.conf.prefs.imageio.PreferencesImageWriterConfiguration;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public class CStoreSCP extends BasicCStoreSCP {
+public class PreferencesConfigurationFactory {
 
+    public static DicomConfiguration createDicomConfiguration()
+            throws ConfigurationException {
+        PreferencesDicomConfiguration prefsConfig = new PreferencesDicomConfiguration();
+        PreferencesHL7Configuration hl7Config = new PreferencesHL7Configuration();
+        prefsConfig.addDicomConfigurationExtension(hl7Config);
+        PreferencesArchiveConfiguration arcConfig = new PreferencesArchiveConfiguration();
+        prefsConfig.addDicomConfigurationExtension(arcConfig);
+        hl7Config.addHL7ConfigurationExtension(arcConfig);
+        prefsConfig.addDicomConfigurationExtension(
+                new PreferencesAuditLoggerConfiguration());
+        prefsConfig.addDicomConfigurationExtension(
+                new PreferencesAuditRecordRepositoryConfiguration());
+        prefsConfig.addDicomConfigurationExtension(
+                new PreferencesImageReaderConfiguration());
+        prefsConfig.addDicomConfigurationExtension(
+                new PreferencesImageWriterConfiguration());
+        return prefsConfig;
+    }
 }

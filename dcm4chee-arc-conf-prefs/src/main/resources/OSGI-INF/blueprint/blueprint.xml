@@ -8,7 +8,7 @@
         ref="prefsConf" />
 
     <bean
-        class="org.dcm4chee.archive.conf.prefsimpl.PreferencesConfigurationFactory"
+        class="org.dcm4chee.archive.conf.prefs.impl.PreferencesConfigurationFactory"
         id="prefsConf"
         activation="eager"
         factory-method="createDicomConfiguration">

@@ -5,9 +5,9 @@
 
   <!-- this is the service this bundle is exposing (the Device Service) -->
   <service
-    id="archiveDevice"
-    interface="org.dcm4che.net.DeviceServiceInterface"
-    ref="archiveDeviceImpl" />
+    id="archiveService"
+    interface="org.dcm4chee.archive.ArchiveService"
+    ref="archiveServiceImpl" />
 
   <!-- osgi blueprint property placeholder -->
   <cm:property-placeholder
@@ -22,8 +22,8 @@
   </cm:property-placeholder>
 
   <bean
-    class="org.dcm4chee.archive.ArchiveService"
-    id="archiveDeviceImpl"
+    class="org.dcm4chee.archive.impl.ArchiveServiceImpl"
+    id="archiveServiceImpl"
     activation="eager"
     init-method="init"
     destroy-method="destroy">

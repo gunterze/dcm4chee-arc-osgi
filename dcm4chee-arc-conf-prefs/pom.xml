@@ -37,6 +37,10 @@
       <artifactId>dcm4che-conf-prefs-audit</artifactId>
     </dependency>    
     <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-prefs-imageio</artifactId>
+    </dependency>    
+    <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
       <artifactId>dcm4chee-arc-conf</artifactId>
       <version>${project.version}</version>

@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf.prefsimpl;
+package org.dcm4chee.archive.conf.prefs.impl;
 
 import java.security.cert.CertificateException;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.prefs.PreferencesDicomConfigurationExtension;
 import org.dcm4che.conf.prefs.PreferencesUtils;
 import org.dcm4che.conf.prefs.hl7.PreferencesHL7ConfigurationExtension;
-// import org.dcm4che.conf.prefs.imageio.PreferencesCompressionRulesConfiguration;
+import org.dcm4che.conf.prefs.imageio.PreferencesCompressionRulesConfiguration;
 import org.dcm4che.data.Code;
 import org.dcm4che.data.ValueSelector;
 import org.dcm4che.net.ApplicationEntity;
@@ -117,8 +117,8 @@ public class PreferencesArchiveConfiguration
             return;
 
         config.store(arcAE.getAttributeCoercions(), aeNode);
-//        PreferencesCompressionRulesConfiguration
-//                .store(arcAE.getCompressionRules(), aeNode);
+        PreferencesCompressionRulesConfiguration
+                .store(arcAE.getCompressionRules(), aeNode);
         storeStoreDuplicates(arcAE.getStoreDuplicates(), aeNode);
     }
 
@@ -299,8 +299,8 @@ public class PreferencesArchiveConfiguration
             return;
 
         config.load(arcae.getAttributeCoercions(), aeNode);
-//        PreferencesCompressionRulesConfiguration
-//                .load(arcae.getCompressionRules(), aeNode);
+        PreferencesCompressionRulesConfiguration.load(
+                arcae.getCompressionRules(), aeNode);
         loadStoreDuplicates(arcae.getStoreDuplicates(), aeNode);
     }
 
@@ -564,8 +564,8 @@ public class PreferencesArchiveConfiguration
             return;
 
         config.merge(aa.getAttributeCoercions(), bb.getAttributeCoercions(), aePrefs);
-//        PreferencesCompressionRulesConfiguration
-//            .merge(aa.getCompressionRules(), bb.getCompressionRules(), aePrefs);
+        PreferencesCompressionRulesConfiguration.merge(
+                aa.getCompressionRules(), bb.getCompressionRules(), aePrefs);
 
         mergeStoreDuplicates(aa.getStoreDuplicates(), bb.getStoreDuplicates(), aePrefs);
     }

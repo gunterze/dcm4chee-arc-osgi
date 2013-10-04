@@ -20,7 +20,7 @@
     <AD
       id="device-name"
       type="String"
-      default="ECHOSCP"
+      default="dcm4chee-arc"
       name="device-name"
       description="DICOM Device Name" />
   </OCD>

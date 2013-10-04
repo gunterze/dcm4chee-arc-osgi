@@ -17,7 +17,7 @@
     <cm:default-properties>
       <cm:property
         name="device-name"
-        value="ECHOSCP" />
+        value="dcm4chee-arc" />
     </cm:default-properties>
   </cm:property-placeholder>
 

@@ -16,10 +16,17 @@
         <property
             name="archiveService"
             ref="archiveService" />
+        <property
+            name="fileSystemService"
+            ref="fileSystemService" />
     </bean>
 
     <reference
         id="archiveService"
         interface="org.dcm4chee.archive.ArchiveService" />
+
+    <reference
+        id="fileSystemService"
+        interface="org.dcm4chee.archive.fs.FileSystemService" />
 
 </blueprint>

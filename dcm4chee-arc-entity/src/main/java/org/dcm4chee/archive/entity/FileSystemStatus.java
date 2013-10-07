@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,30 +36,10 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive;
+package org.dcm4chee.archive.entity;
 
-import org.dcm4che.net.Device;
-import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
-import org.dcm4che.net.service.DicomServiceRegistry;
-
-/**
- * @author Gunter Zeilinger <gunterze@gmail.com>
- *
- */
-public interface ArchiveService {
-
-    boolean isRunning();
-
-    void start() throws Exception;
-
-    void stop();
-
-    void reload() throws Exception;
-
-    Device getDevice();
-
-    DicomServiceRegistry getServiceRegistry();
-
-    HL7ServiceRegistry getHL7ServiceRegistry();
-
+public enum FileSystemStatus {
+    RW,
+    Rw,
+    RO
 }

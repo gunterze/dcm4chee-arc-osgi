@@ -1,0 +1,20 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <service
+        id="fileSystemService"
+        interface="org.dcm4chee.archive.fs.FileSystemService"
+        ref="fileSystemServiceImpl" />
+
+    <bean
+        class="org.dcm4chee.archive.fs.impl.FileSystemServiceImpl"
+        id="fileSystemServiceImpl"
+        activation="lazy">
+        <property name="entityManagerFactory" ref="emf"/>
+    </bean>
+
+    <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+        filter="(osgi.unit.name=dcm4chee-arc-entity-4.2.0-SNAPSHOT.jar#dcm4chee-arc)" activation="eager"/>
+
+</blueprint>

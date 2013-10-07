@@ -38,8 +38,35 @@
 
 package org.dcm4chee.archive.store.impl;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import org.dcm4che.data.Attributes;
+import org.dcm4che.data.Tag;
+import org.dcm4che.data.UID;
+import org.dcm4che.io.DicomInputStream;
+import org.dcm4che.io.DicomInputStream.IncludeBulkData;
+import org.dcm4che.io.DicomOutputStream;
+import org.dcm4che.net.ApplicationEntity;
+import org.dcm4che.net.Association;
+import org.dcm4che.net.PDVInputStream;
+import org.dcm4che.net.Status;
+import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicCStoreSCP;
+import org.dcm4che.net.service.DicomServiceException;
+import org.dcm4che.util.AttributesFormat;
 import org.dcm4chee.archive.ArchiveService;
+import org.dcm4chee.archive.conf.ArchiveAEExtension;
+import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4chee.archive.fs.FileSystemService;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -48,6 +75,7 @@ import org.dcm4chee.archive.ArchiveService;
 public class CStoreSCP extends BasicCStoreSCP {
 
     private ArchiveService archiveService;
+    private FileSystemService fileSystemService;
 
     public CStoreSCP() {
         super("*");
@@ -61,6 +89,14 @@ public class CStoreSCP extends BasicCStoreSCP {
         this.archiveService = archiveService;
     }
 
+    public FileSystemService getFileSystemService() {
+        return fileSystemService;
+    }
+
+    public void setFileSystemService(FileSystemService fileSystemService) {
+        this.fileSystemService = fileSystemService;
+    }
+
     public void init() {
         archiveService.getServiceRegistry().addDicomService(this);
     }
@@ -68,4 +104,129 @@ public class CStoreSCP extends BasicCStoreSCP {
     public void destroy() {
         archiveService.getServiceRegistry().removeDicomService(this);
     }
+
+    @Override
+    protected void store(Association as, PresentationContext pc,
+            Attributes rq, PDVInputStream data, Attributes rsp)
+            throws IOException {
+
+        String sourceAET = as.getRemoteAET();
+        String cuid = rq.getString(Tag.AffectedSOPClassUID);
+        String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
+        String tsuid = pc.getTransferSyntax();
+        Attributes fmi = as.createFileMetaInformation(iuid, cuid, tsuid);
+
+        ArchiveAEExtension aeExt = archiveAEExtensionOf(as);
+        FileSystem fs = selectStorageFileSystem(as, aeExt);
+        Path fsPath = fs.getPath();
+        Path spoolPath = createSpoolPath(fsPath, aeExt, sourceAET, cuid);
+        File spoolFile = spoolPath.toFile();
+        try {
+            MessageDigest digest = messageDigestOf(aeExt);
+            storeTo(as, fmi, data, spoolFile, digest);
+            Attributes attrs = parse(spoolFile);
+            Path filePath = move(spoolPath, fsPath, aeExt, attrs);
+            // TO DO
+        } catch (Exception e) {
+            if (e instanceof DicomServiceException) {
+                throw (DicomServiceException) e;
+            } else {
+                throw new DicomServiceException(Status.ProcessingFailure, e);
+            }
+        }
+    }
+
+    private Path move(Path spoolPath, Path fsPath, ArchiveAEExtension aeExt,
+            Attributes attrs) throws Exception{
+        AttributesFormat filePathFormat = aeExt.getStorageFilePathFormat();
+        if (filePathFormat == null)
+            throw new DicomServiceException(
+                    Status.ProcessingFailure,
+                    "No StorageFilePathFormat configured for "
+                            + aeExt.getApplicationEntity().getAETitle());
+
+        Path filePath;
+        synchronized (filePathFormat) {
+            filePath = fsPath.resolve(filePathFormat.format(attrs));
+        }
+        Files.createDirectories(filePath.getParent());
+        for (;;) {
+            try {
+                return Files.move(spoolPath, filePath);
+            } catch (FileAlreadyExistsException e) {
+                filePath = filePath.resolveSibling(
+                        filePath.getFileName().toString() + '-');
+            }
+        }
+    }
+
+    private Attributes parse(File file) throws IOException {
+        try (DicomInputStream in = new DicomInputStream(file)) {
+            in.setIncludeBulkData(IncludeBulkData.URI);
+            return in.readDataset(-1, -1);
+        }
+    }
+
+    private void storeTo(Association as, Attributes fmi, PDVInputStream data,
+            File file, MessageDigest digest) throws Exception {
+        try (DicomOutputStream out = digest == null
+                ? new DicomOutputStream(file)
+                : new DicomOutputStream(
+                        new BufferedOutputStream(
+                                new DigestOutputStream(
+                                        new FileOutputStream(file), digest)),
+                            UID.ExplicitVRLittleEndian)) {
+            out.writeFileMetaInformation(fmi);
+            data.copyTo(out);
+        }
+    }
+
+    private Path createSpoolPath(Path fsPath, ArchiveAEExtension aeExt,
+            String sourceAET, String cuid) throws DicomServiceException {
+        try {
+            String spoolDirectoryPath = aeExt.getSpoolDirectoryPath();
+            if (spoolDirectoryPath == null)
+                return Files.createTempFile("dcm", ".dcm");
+    
+            Path dir = fsPath.resolve(spoolDirectoryPath).resolve(sourceAET).resolve(cuid);
+            return Files.createTempFile(Files.createDirectories(dir), "dcm", ".dcm");
+        } catch (IOException e) {
+            throw new DicomServiceException(Status.ProcessingFailure, e);
+        }
+    }
+
+    private MessageDigest messageDigestOf(ArchiveAEExtension aeExt)
+            throws NoSuchAlgorithmException {
+        String algorithm = aeExt.getDigestAlgorithm();
+        return algorithm != null
+                ? MessageDigest.getInstance(algorithm)
+                : null;
+    }
+
+    private ArchiveAEExtension archiveAEExtensionOf(Association as)
+            throws DicomServiceException {
+        ApplicationEntity ae = as.getApplicationEntity();
+        ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
+        if (aeExt == null)
+            throw new DicomServiceException(
+                    Status.ProcessingFailure,
+                    "No ArchiveAEExtension configured for "
+                            + ae.getAETitle());
+        return aeExt;
+    }
+
+
+    private FileSystem selectStorageFileSystem(Association as,
+            ArchiveAEExtension aeExt) throws DicomServiceException {
+        FileSystem fs = (FileSystem) as.getProperty(FileSystem.class.getName());
+        if (fs == null) {
+            fs = fileSystemService.selectStorageFileSystem(
+                    aeExt.getFileSystemGroupID(),
+                    aeExt.getInitFileSystemURI());
+            as.setProperty(FileSystem.class.getName(), fs);
+        }
+        return fs;
+    }
+
+
 }

@@ -5,9 +5,9 @@
     <artifactId>dcm4chee-arc-parent</artifactId>
     <version>4.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>dcm4chee-arc-conf-prefs</artifactId>
+  <artifactId>dcm4chee-arc-filesystem</artifactId>
   <packaging>bundle</packaging>
-  <name>dcm4chee-arc-conf-prefs</name>
+  <name>dcm4chee-arc-filesystem</name>
   <build>
     <plugins>
       <plugin>
@@ -20,20 +20,17 @@
   <dependencies>
     <dependency>
       <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-conf-prefs-hl7</artifactId>
+      <artifactId>dcm4che-net</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-conf-prefs-audit</artifactId>
-    </dependency>    
-    <dependency>
-      <groupId>org.dcm4che</groupId>
-      <artifactId>dcm4che-conf-prefs-imageio</artifactId>
-    </dependency>    
-    <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-conf</artifactId>
+      <artifactId>dcm4chee-arc-entity</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

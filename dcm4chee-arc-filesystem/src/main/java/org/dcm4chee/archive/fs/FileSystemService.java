@@ -36,30 +36,18 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive;
+package org.dcm4chee.archive.fs;
 
-import org.dcm4che.net.Device;
-import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
-import org.dcm4che.net.service.DicomServiceRegistry;
+import org.dcm4che.net.service.DicomServiceException;
+import org.dcm4chee.archive.entity.FileSystem;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface ArchiveService {
+public interface FileSystemService {
 
-    boolean isRunning();
-
-    void start() throws Exception;
-
-    void stop();
-
-    void reload() throws Exception;
-
-    Device getDevice();
-
-    DicomServiceRegistry getServiceRegistry();
-
-    HL7ServiceRegistry getHL7ServiceRegistry();
+    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
+            throws DicomServiceException;
 
 }

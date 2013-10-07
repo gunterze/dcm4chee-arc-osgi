@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,30 +36,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive;
-
-import org.dcm4che.net.Device;
-import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
-import org.dcm4che.net.service.DicomServiceRegistry;
+package org.dcm4chee.archive.entity;
 
 /**
+ * @author Damien Evans <damien.daddy@gmail.com>
+ * @author Justin Falk <jfalkmu@gmail.com>
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
  */
-public interface ArchiveService {
+public enum Availability {
+    ONLINE,
+    NEARLINE,
+    OFFLINE,
+    REJECTED_FOR_QUALITY_REASONS_REJECTION_NOTE,
+    REJECTED_FOR_QUALITY_REASONS,
+    REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE,
+    REJECTED_FOR_PATIENT_SAFETY_REASONS,
+    INCORRECT_MODALITY_WORKLIST_ENTRY_REJECTION_NOTE,
+    INCORRECT_MODALITY_WORKLIST_ENTRY,
+    DATA_RETENTION_PERIOD_EXPIRED_REJECTION_NOTE,
+    DATA_RETENTION_PERIOD_EXPIRED;
 
-    boolean isRunning();
+    public String toCodeString() {
+        return available() ? name() : "UNAVAILABLE";
+    }
 
-    void start() throws Exception;
+    public boolean available() {
+        return compareTo(OFFLINE) <= 0;
+    }
 
-    void stop();
-
-    void reload() throws Exception;
-
-    Device getDevice();
-
-    DicomServiceRegistry getServiceRegistry();
-
-    HL7ServiceRegistry getHL7ServiceRegistry();
+    public static Availability availabilityOfRejectedObject(Availability avail) {
+        switch (avail) {
+        case REJECTED_FOR_QUALITY_REASONS_REJECTION_NOTE:
+            return REJECTED_FOR_QUALITY_REASONS;
+        case REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE:
+            return REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE;
+        case INCORRECT_MODALITY_WORKLIST_ENTRY_REJECTION_NOTE:
+            return INCORRECT_MODALITY_WORKLIST_ENTRY;
+        case DATA_RETENTION_PERIOD_EXPIRED_REJECTION_NOTE:
+            return DATA_RETENTION_PERIOD_EXPIRED;
+       default:
+            throw new IllegalArgumentException("availability: " + avail);
+        }
+    }
 
 }

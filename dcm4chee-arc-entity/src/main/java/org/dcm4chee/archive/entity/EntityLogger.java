@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,30 +36,47 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive;
+package org.dcm4chee.archive.entity;
 
-import org.dcm4che.net.Device;
-import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
-import org.dcm4che.net.service.DicomServiceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * @author Damien Evans <damien.daddy@gmail.com>
+ * @author Justin Falk <jfalkmu@gmail.com>
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
  */
-public interface ArchiveService {
+public class EntityLogger {
 
-    boolean isRunning();
+    private Logger getLogger(Object entity) {
+        return LoggerFactory.getLogger(entity.getClass());
+    }
 
-    void start() throws Exception;
+    public void onPrePersist(Object entity) {
+        getLogger(entity).debug("Creating {}", entity);
+    }
 
-    void stop();
+    public void onPostPersist(Object entity) {
+        getLogger(entity).debug("Created {}", entity);
+    }
 
-    void reload() throws Exception;
+    public void onPostLoad(Object entity) {
+        getLogger(entity).debug("Loaded {}", entity);
+    }
 
-    Device getDevice();
+    public void onPreUpdate(Object entity) {
+        getLogger(entity).debug("Updating {}", entity);
+    }
 
-    DicomServiceRegistry getServiceRegistry();
+    public void onPostUpdate(Object entity) {
+        getLogger(entity).debug("Updated {}", entity);
+    }
 
-    HL7ServiceRegistry getHL7ServiceRegistry();
+    public void onPreRemove(Object entity) {
+        getLogger(entity).debug("Deleting {}", entity);
+    }
 
+    public void onPostRemove(Object entity) {
+        getLogger(entity).debug("Deleted {}", entity);
+    }
 }

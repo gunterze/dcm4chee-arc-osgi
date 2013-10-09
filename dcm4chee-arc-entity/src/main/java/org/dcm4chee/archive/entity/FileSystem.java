@@ -43,6 +43,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javassist.util.proxy.ProxyObject;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,6 +57,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.proxy.HibernateProxy;
 
 /**
  * @author Damien Evans <damien.daddy@gmail.com>
@@ -76,6 +80,10 @@ import javax.persistence.Table;
 })
 public class FileSystem implements Serializable {
 
+    //this properties are added just to force bnd tool to include it in the bundle imports
+    private static HibernateProxy proxy;
+    private static ProxyObject proxyassist;
+    
     private static final long serialVersionUID = -5237294062957988389L;
 
     public static final String FIND_BY_GROUP_ID = "FileSystem.findByGroupID";

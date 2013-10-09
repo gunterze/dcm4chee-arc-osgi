@@ -1,0 +1,19 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean
+    id="pp"
+    class="org.hibernate.jpa.HibernatePersistenceProvider" />
+
+  <service
+    interface="javax.persistence.spi.PersistenceProvider"
+    ref="pp">
+    <service-properties>
+      <entry
+        key="javax.persistence.provider"
+        value="org.hibernate.jpa.HibernatePersistenceProvider" />
+    </service-properties>
+  </service>
+
+</blueprint>

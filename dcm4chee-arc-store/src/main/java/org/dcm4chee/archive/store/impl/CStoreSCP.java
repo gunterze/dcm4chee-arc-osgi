@@ -110,18 +110,18 @@ public class CStoreSCP extends BasicCStoreSCP {
             Attributes rq, PDVInputStream data, Attributes rsp)
             throws IOException {
 
-        String sourceAET = as.getRemoteAET();
-        String cuid = rq.getString(Tag.AffectedSOPClassUID);
-        String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
-        String tsuid = pc.getTransferSyntax();
-        Attributes fmi = as.createFileMetaInformation(iuid, cuid, tsuid);
-
-        ArchiveAEExtension aeExt = archiveAEExtensionOf(as);
-        FileSystem fs = selectStorageFileSystem(as, aeExt);
-        Path fsPath = fs.getPath();
-        Path spoolPath = createSpoolPath(fsPath, aeExt, sourceAET, cuid);
-        File spoolFile = spoolPath.toFile();
         try {
+            String sourceAET = as.getRemoteAET();
+            String cuid = rq.getString(Tag.AffectedSOPClassUID);
+            String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
+            String tsuid = pc.getTransferSyntax();
+            Attributes fmi = as.createFileMetaInformation(iuid, cuid, tsuid);
+    
+            ArchiveAEExtension aeExt = archiveAEExtensionOf(as);
+            FileSystem fs = selectStorageFileSystem(as, aeExt);
+            Path fsPath = fs.getPath();
+            Path spoolPath = createSpoolPath(fsPath, aeExt, sourceAET, cuid);
+            File spoolFile = spoolPath.toFile();
             MessageDigest digest = messageDigestOf(aeExt);
             storeTo(as, fmi, data, spoolFile, digest);
             Attributes attrs = parse(spoolFile);
@@ -217,7 +217,7 @@ public class CStoreSCP extends BasicCStoreSCP {
 
 
     private FileSystem selectStorageFileSystem(Association as,
-            ArchiveAEExtension aeExt) throws DicomServiceException {
+            ArchiveAEExtension aeExt) throws Exception {
         FileSystem fs = (FileSystem) as.getProperty(FileSystem.class.getName());
         if (fs == null) {
             fs = fileSystemService.selectStorageFileSystem(

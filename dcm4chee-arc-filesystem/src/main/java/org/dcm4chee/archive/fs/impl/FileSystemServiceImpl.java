@@ -45,6 +45,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
+import javax.transaction.UserTransaction;
 
 import org.dcm4che.net.Status;
 import org.dcm4che.net.service.DicomServiceException;
@@ -61,17 +62,29 @@ import org.dcm4chee.archive.fs.FileSystemService;
 public class FileSystemServiceImpl implements FileSystemService {
 
     private EntityManagerFactory emf;
+    private UserTransaction utx;
 
     public void setEntityManagerFactory(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
+    public void setUserTransaction(UserTransaction utx) {
+        this.utx = utx;
+    }
+
     @Override
     public FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws DicomServiceException {
+        throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
-            return selectStorageFileSystem(em, groupID, defaultURI);
+            utx.begin();
+            em.joinTransaction();
+            FileSystem fs = selectStorageFileSystem(em, groupID, defaultURI);
+            utx.commit();
+            return fs;
+        } catch (Exception e) {
+            try { utx.rollback(); } catch (Exception ignore) {}
+            throw e;
         } finally {
             em.close();
         }

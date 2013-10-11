@@ -35,62 +35,36 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
-package org.dcm4chee.archive.conf;
-
-import java.io.Serializable;
-import java.util.Arrays;
+package org.dcm4chee.archive.entity;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.data.ValueSelector;
+
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
+ *
  */
-public class AttributeFilter implements Serializable {
+public class PatientStudySeriesAttributes {
+    
+    private final byte[] seriesAttrs;
+    private final byte[] studyAttrs;
+    private final byte[] patientAttrs;
 
-    private static final long serialVersionUID = -2417549681350544302L;
-
-    private final int[] selection;
-    private ValueSelector customAttribute1;
-    private ValueSelector customAttribute2;
-    private ValueSelector customAttribute3;
-
-    public AttributeFilter(int... selection) {
-        Arrays.sort(this.selection = selection);
+    public PatientStudySeriesAttributes(
+            byte[] seriesAttributes,
+            byte[] studyAttributes,
+            byte[] patientAttributes) {
+        this.seriesAttrs = seriesAttributes;
+        this.studyAttrs = studyAttributes;
+        this.patientAttrs = patientAttributes;
     }
 
-    public static String selectStringValue(Attributes attrs,
-            ValueSelector selector, String defVal) {
-        return selector != null ? selector.selectStringValue(attrs, defVal) : defVal;
-    }
-
-    public int[] getSelection() {
-        return selection;
-    }
-
-    public void setCustomAttribute1(ValueSelector customAttribute1) {
-        this.customAttribute1 = customAttribute1;
-    }
-
-    public ValueSelector getCustomAttribute1() {
-        return customAttribute1;
-    }
-
-    public void setCustomAttribute2(ValueSelector customAttribute2) {
-        this.customAttribute2 = customAttribute2;
-    }
-
-    public ValueSelector getCustomAttribute2() {
-        return customAttribute2;
-    }
-
-    public void setCustomAttribute3(ValueSelector customAttribute3) {
-        this.customAttribute3 = customAttribute3;
-    }
-
-    public ValueSelector getCustomAttribute3() {
-        return customAttribute3;
+    public Attributes getAttributes() {
+        Attributes attrs = new Attributes();
+        Utils.decodeAttributes(attrs, patientAttrs);
+        Utils.decodeAttributes(attrs, studyAttrs);
+        Utils.decodeAttributes(attrs, seriesAttrs);
+        return attrs;
     }
 
 }

@@ -36,61 +36,74 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.conf;
+package org.dcm4chee.archive.entity;
 
-import java.io.Serializable;
-import java.util.Arrays;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.data.ValueSelector;
 
 /**
+ * @author Damien Evans <damien.daddy@gmail.com>
+ * @author Justin Falk <jfalkmu@gmail.com>
  * @author Gunter Zeilinger <gunterze@gmail.com>
+ * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class AttributeFilter implements Serializable {
+@NamedQueries({
+@NamedQuery(
+    name="Issuer.findByEntityID",
+    query="SELECT i FROM Issuer i WHERE i.localNamespaceEntityID = ?1"),
+@NamedQuery(
+    name="Issuer.findByEntityUID",
+    query="SELECT i FROM Issuer i " +
+          "WHERE i.universalEntityID = ?1 AND i.universalEntityIDType = ?2"),
+@NamedQuery(
+    name="Issuer.findByEntityIDorUID",
+    query="SELECT i FROM Issuer i WHERE i.localNamespaceEntityID = ?1 " +
+          "OR (i.universalEntityID = ?2 AND i.universalEntityIDType = ?3)")
+})
+@Entity
+@Table(name = "issuer")
+public class Issuer extends org.dcm4che.data.Issuer {
 
-    private static final long serialVersionUID = -2417549681350544302L;
+    private static final long serialVersionUID = -3985937520970392728L;
 
-    private final int[] selection;
-    private ValueSelector customAttribute1;
-    private ValueSelector customAttribute2;
-    private ValueSelector customAttribute3;
+    public static final String FIND_BY_ENTITY_ID = "Issuer.findByEntityID";
 
-    public AttributeFilter(int... selection) {
-        Arrays.sort(this.selection = selection);
+    public static final String FIND_BY_ENTITY_UID = "Issuer.findByEntityUID";
+
+    public static final String FIND_BY_ENTITY_ID_OR_UID = "Issuer.findByEntityIDorUID";
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "pk")
+    private long pk;
+
+    public Issuer() {}
+
+    public Issuer(String entityID, String entityUID, String entityUIDType) {
+        super(entityID, entityUID, entityUIDType);
     }
 
-    public static String selectStringValue(Attributes attrs,
-            ValueSelector selector, String defVal) {
-        return selector != null ? selector.selectStringValue(attrs, defVal) : defVal;
+    public Issuer(Attributes item) {
+        super(item);
     }
 
-    public int[] getSelection() {
-        return selection;
+    public Issuer(String issuerOfPatientID, Attributes item) {
+        super(issuerOfPatientID, item);
     }
 
-    public void setCustomAttribute1(ValueSelector customAttribute1) {
-        this.customAttribute1 = customAttribute1;
+    public Issuer(org.dcm4che.data.Issuer other) {
+        super(other);
     }
 
-    public ValueSelector getCustomAttribute1() {
-        return customAttribute1;
+    public long getPk() {
+        return pk;
     }
-
-    public void setCustomAttribute2(ValueSelector customAttribute2) {
-        this.customAttribute2 = customAttribute2;
-    }
-
-    public ValueSelector getCustomAttribute2() {
-        return customAttribute2;
-    }
-
-    public void setCustomAttribute3(ValueSelector customAttribute3) {
-        this.customAttribute3 = customAttribute3;
-    }
-
-    public ValueSelector getCustomAttribute3() {
-        return customAttribute3;
-    }
-
 }

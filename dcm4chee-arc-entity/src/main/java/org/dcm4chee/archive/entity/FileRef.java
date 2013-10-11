@@ -39,9 +39,7 @@
 package org.dcm4chee.archive.entity;
 
 import java.io.Serializable;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -51,9 +49,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 /**
@@ -62,25 +59,10 @@ import javax.persistence.Table;
  * @author Gunter Zeilinger <gunterze@gmail.com>
  */
 @Entity
-@Table(name = "filesystem")
-@NamedQueries({
-@NamedQuery(
-    name = "FileSystem.findByGroupID",
-    query = "SELECT fs FROM FileSystem fs WHERE fs.groupID = ?1"),
-@NamedQuery(
-    name = "FileSystem.findByGroupIDAndStatus",
-    query = "SELECT fs FROM FileSystem fs WHERE fs.groupID = ?1 AND fs.status = ?2"),
-@NamedQuery(
-    name = "FileSystem.getGroupIDs",
-    query = "SELECT DISTINCT fs.groupID FROM FileSystem fs")
-})
-public class FileSystem implements Serializable {
+@Table(name = "file_ref")
+public class FileRef implements Serializable {
 
-    private static final long serialVersionUID = -5237294062957988389L;
-
-    public static final String FIND_BY_GROUP_ID = "FileSystem.findByGroupID";
-    public static final String FIND_BY_GROUP_ID_AND_STATUS = "FileSystem.findByGroupIDAndStatus";
-    public static final String GET_GROUP_IDS = "FileSystem.getGroupIDs";
+    private static final long serialVersionUID = 1735835006678974580L;
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -88,86 +70,92 @@ public class FileSystem implements Serializable {
     private long pk;
 
     @Basic(optional = false)
-    @Column(name = "fs_group_id")
-    private String groupID;
+    @Column(name = "created_time", updatable = false)
+    private Date createdTime;
 
     @Basic(optional = false)
-    @Column(name = "fs_uri", unique = true)
-    private String uri;
+    @Column(name = "filepath", updatable = false)
+    private String filePath;
 
     @Basic(optional = false)
-    @Column(name = "availability")
-    private Availability availability;
+    @Column(name = "file_tsuid", updatable = false)
+    private String transferSyntaxUID;
 
     @Basic(optional = false)
-    @Column(name = "fs_status")
-    private FileSystemStatus status;
+    @Column(name = "file_size", updatable = false)
+    private long fileSize;
 
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "next_fk")
-    private FileSystem nextFileSystem;
+    @Basic(optional = true)
+    @Column(name = "file_digest", updatable = false)
+    private String digest;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "instance_fk", updatable = false)
+    private Instance instance;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "filesystem_fk", updatable = false)
+    private FileSystem fileSystem;
+
+    public FileRef() {};
+
+    public FileRef(FileSystem fileSystem, String filePath, String transferSyntaxUID,
+            long fileSize, String digest) {
+        this.fileSystem = fileSystem;
+        this.filePath = filePath;
+        this.transferSyntaxUID = transferSyntaxUID;
+        this.fileSize = fileSize;
+        this.digest = digest;
+    }
+
+    @PrePersist
+    public void onPrePersist() {
+        Date now = new Date();
+        createdTime = now;
+    }
 
     public long getPk() {
         return pk;
     }
 
-    public String getURI() {
-        return uri;
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
-    public void setURI(String uri) {
-        this.uri = uri.endsWith("/")
-                ? uri.substring(0, uri.length() - 1)
-                : uri;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public String getGroupID() {
-        return groupID;
+    public String getTransferSyntaxUID() {
+        return transferSyntaxUID;
     }
 
-    public void setGroupID(String groupID) {
-        this.groupID = groupID;
+    public long getFileSize() {
+        return fileSize;
     }
 
-    public Availability getAvailability() {
-        return availability;
+    public String getDigest() {
+        return digest;
     }
 
-    public void setAvailability(Availability availability) {
-        this.availability = availability;
+    public Instance getInstance() {
+        return instance;
     }
 
-    public FileSystemStatus getStatus() {
-        return status;
+    public void setInstance(Instance instance) {
+        this.instance = instance;
     }
 
-    public void setStatus(FileSystemStatus status) {
-        this.status = status;
-    }
-
-    public FileSystem getNextFileSystem() {
-        return nextFileSystem;
-    }
-
-    public void setNextFileSystem(FileSystem nextFileSystem) {
-        this.nextFileSystem = nextFileSystem;
-    }
-
-    public Path getPath() {
-        try {
-            return Paths.get(new URI(uri));
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage());
-        }
+    public FileSystem getFileSystem() {
+        return fileSystem;
     }
 
     @Override
     public String toString() {
-        return "FileSystem[pk=" + pk
-                + ", group=" + groupID
-                + ", uri=" + uri
-                + ", avail=" + availability
-                + ", status=" + status
+        return "File[pk=" + pk
+                + ", path=" + filePath
+                + ", tsuid=" + transferSyntaxUID
+                + ", size=" + fileSize
                 + "]";
     }
 }

@@ -38,7 +38,6 @@
 
 package org.dcm4chee.archive.fs;
 
-import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4chee.archive.entity.FileSystem;
 
 /**
@@ -48,6 +47,6 @@ import org.dcm4chee.archive.entity.FileSystem;
 public interface FileSystemService {
 
     FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws DicomServiceException;
+            throws Exception;
 
 }

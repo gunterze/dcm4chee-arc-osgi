@@ -35,62 +35,60 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
+package org.dcm4chee.archive.entity;
 
-package org.dcm4chee.archive.conf;
-
-import java.io.Serializable;
-import java.util.Arrays;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.data.ValueSelector;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
+ *
  */
-public class AttributeFilter implements Serializable {
+public class InstanceFileRef {
+    public final Long seriesPk;
+    public final String sopClassUID;
+    public final String sopInstanceUID;
+    public final Availability instanceAvailability;
+    public final String retrieveAETs;
+    public final String externalRetrieveAET;
+    public final String uri;
+    public final String transferSyntaxUID;
+    public final Availability fileAvailability;
+    private final byte[] instAttrs;
 
-    private static final long serialVersionUID = -2417549681350544302L;
-
-    private final int[] selection;
-    private ValueSelector customAttribute1;
-    private ValueSelector customAttribute2;
-    private ValueSelector customAttribute3;
-
-    public AttributeFilter(int... selection) {
-        Arrays.sort(this.selection = selection);
+    public InstanceFileRef(Long seriesPk, String sopClassUID,
+            String sopInstanceUID, Availability instanceAvailability,
+            String retrieveAETs, String externalRetrieveAET,
+            String fsuri, String filePath, String transferSyntaxUID,
+            Availability fileAvailability, byte[] instAttrs) {
+        this.seriesPk = seriesPk;
+        this.sopClassUID = sopClassUID;
+        this.sopInstanceUID = sopInstanceUID;
+        this.instanceAvailability = instanceAvailability;
+        this.retrieveAETs = retrieveAETs;
+        this.externalRetrieveAET = externalRetrieveAET;
+        this.uri = fsuri != null ? fsuri + filePath : null;
+        this.transferSyntaxUID = transferSyntaxUID;
+        this.fileAvailability = fileAvailability;
+        this.instAttrs = instAttrs;
     }
 
-    public static String selectStringValue(Attributes attrs,
-            ValueSelector selector, String defVal) {
-        return selector != null ? selector.selectStringValue(attrs, defVal) : defVal;
+    public File getFile() {
+        try {
+            return new File(new URI(uri));
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("uri: " + uri);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("uri: " + uri);
+        }
     }
 
-    public int[] getSelection() {
-        return selection;
+    public Attributes getAttributes(Attributes seriesAttrs) {
+        Attributes attrs = new Attributes(seriesAttrs);
+        Utils.decodeAttributes(attrs, instAttrs);
+        return attrs;
     }
-
-    public void setCustomAttribute1(ValueSelector customAttribute1) {
-        this.customAttribute1 = customAttribute1;
-    }
-
-    public ValueSelector getCustomAttribute1() {
-        return customAttribute1;
-    }
-
-    public void setCustomAttribute2(ValueSelector customAttribute2) {
-        this.customAttribute2 = customAttribute2;
-    }
-
-    public ValueSelector getCustomAttribute2() {
-        return customAttribute2;
-    }
-
-    public void setCustomAttribute3(ValueSelector customAttribute3) {
-        this.customAttribute3 = customAttribute3;
-    }
-
-    public ValueSelector getCustomAttribute3() {
-        return customAttribute3;
-    }
-
 }

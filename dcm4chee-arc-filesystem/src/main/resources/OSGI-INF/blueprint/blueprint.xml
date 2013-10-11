@@ -9,12 +9,14 @@
 
     <bean
         class="org.dcm4chee.archive.fs.impl.FileSystemServiceImpl"
-        id="fileSystemServiceImpl"
-        activation="lazy">
+        id="fileSystemServiceImpl">
+        <property name="userTransaction" ref="ut"/>
         <property name="entityManagerFactory" ref="emf"/>
     </bean>
 
+    <reference id="ut" interface="javax.transaction.UserTransaction"/>
+
     <reference id="emf" interface="javax.persistence.EntityManagerFactory"
-        filter="(osgi.unit.name=dcm4chee-arc-entity-4.2.0-SNAPSHOT.jar#dcm4chee-arc)" activation="eager"/>
+        filter="(osgi.unit.name=dcm4chee-arc)"/>
 
 </blueprint>

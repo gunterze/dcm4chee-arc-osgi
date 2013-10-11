@@ -23,4 +23,71 @@
   
   <access>FIELD</access>
 
+  <mapped-superclass class="org.dcm4che.data.Code">
+    <attributes>
+      <basic name="codeValue" optional="false">
+        <column name="code_value"/>
+      </basic>
+      <basic name="codingSchemeDesignator" optional="false">
+        <column name="code_designator"/>
+      </basic>
+      <basic name="codingSchemeVersion" optional="true">
+        <column name="code_version"/>
+      </basic>
+      <basic name="codeMeaning" optional="false">
+        <column name="code_meaning"/>
+      </basic>
+    </attributes>
+  </mapped-superclass>
+
+  <mapped-superclass class="org.dcm4che.data.Issuer">
+    <attributes>
+      <basic name="localNamespaceEntityID" optional="true">
+        <column name="entity_id"/>
+      </basic>
+      <basic name="universalEntityID" optional="true">
+        <column name="entity_uid"/>
+      </basic>
+      <basic name="universalEntityIDType" optional="true">
+        <column name="entity_uid_type"/>
+      </basic>
+    </attributes>
+  </mapped-superclass>
+
+  <entity class="Patient">
+    <table name="patient" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="pat_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="Study">
+    <table name="study" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="study_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="Series">
+    <table name="series" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="series_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="Instance">
+    <table name="instance" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="inst_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
 </entity-mappings>

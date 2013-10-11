@@ -35,62 +35,42 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-
-package org.dcm4chee.archive.conf;
-
-import java.io.Serializable;
-import java.util.Arrays;
-
-import org.dcm4che.data.Attributes;
-import org.dcm4che.data.ValueSelector;
+package org.dcm4chee.archive.entity;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
+ *
  */
-public class AttributeFilter implements Serializable {
+public class SOPInstanceReference {
+    
+    public final String studyInstanceUID;
+    public final String performedProcedureStepClassUID;
+    public final String performedProcedureStepInstanceUID;
+    public final String seriesInstanceUID;
+    public final String sopClassUID;
+    public final String sopInstanceUID;
+    public final Availability availability;
+    public final String retrieveAETs;
+    public final String externalRetrieveAET;
 
-    private static final long serialVersionUID = -2417549681350544302L;
-
-    private final int[] selection;
-    private ValueSelector customAttribute1;
-    private ValueSelector customAttribute2;
-    private ValueSelector customAttribute3;
-
-    public AttributeFilter(int... selection) {
-        Arrays.sort(this.selection = selection);
-    }
-
-    public static String selectStringValue(Attributes attrs,
-            ValueSelector selector, String defVal) {
-        return selector != null ? selector.selectStringValue(attrs, defVal) : defVal;
-    }
-
-    public int[] getSelection() {
-        return selection;
-    }
-
-    public void setCustomAttribute1(ValueSelector customAttribute1) {
-        this.customAttribute1 = customAttribute1;
-    }
-
-    public ValueSelector getCustomAttribute1() {
-        return customAttribute1;
-    }
-
-    public void setCustomAttribute2(ValueSelector customAttribute2) {
-        this.customAttribute2 = customAttribute2;
-    }
-
-    public ValueSelector getCustomAttribute2() {
-        return customAttribute2;
-    }
-
-    public void setCustomAttribute3(ValueSelector customAttribute3) {
-        this.customAttribute3 = customAttribute3;
-    }
-
-    public ValueSelector getCustomAttribute3() {
-        return customAttribute3;
+    public SOPInstanceReference(String studyInstanceUID,
+            String performedProcedureStepClassUID,
+            String performedProcedureStepInstanceUID,
+            String seriesInstanceUID,
+            String sopClassUID,
+            String sopInstanceUID,
+            Availability availability,
+            String retrieveAETs,
+            String externalRetrieveAET) {
+        this.studyInstanceUID = studyInstanceUID;
+        this.performedProcedureStepClassUID = performedProcedureStepClassUID;
+        this.performedProcedureStepInstanceUID = performedProcedureStepInstanceUID;
+        this.seriesInstanceUID = seriesInstanceUID;
+        this.sopClassUID = sopClassUID;
+        this.sopInstanceUID = sopInstanceUID;
+        this.availability = availability;
+        this.retrieveAETs = retrieveAETs;
+        this.externalRetrieveAET = externalRetrieveAET;
     }
 
 }

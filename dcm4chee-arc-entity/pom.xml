@@ -10,7 +10,7 @@
   <name>dcm4chee-arc-entity</name>
   <properties>
     <show_sql>false</show_sql>
-    <hbm2ddl.auto>validate</hbm2ddl.auto>
+    <hbm2ddl.auto>create</hbm2ddl.auto>
   </properties>
   <build>
     <resources>

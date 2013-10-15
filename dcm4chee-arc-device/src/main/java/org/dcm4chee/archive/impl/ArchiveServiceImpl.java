@@ -106,7 +106,7 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     }
 
     public void init() throws Exception {
-        addJBossDirURLSystemProperties();
+        //addJBossDirURLSystemProperties();
         Device device = dicomConfig.findDevice(deviceName);
         init(device);
         device.setDimseRQHandler(serviceRegistry);

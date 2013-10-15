@@ -1,0 +1,22 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <service
+        id="issuerService"
+        interface="org.dcm4chee.archive.issuer.IssuerService"
+        ref="issuerServiceImpl" />
+
+    <bean
+        class="org.dcm4chee.archive.issuer.impl.IssuerServiceImpl"
+        id="issuerServiceImpl">
+        <property name="userTransaction" ref="utx"/>
+        <property name="entityManagerFactory" ref="emf"/>
+    </bean>
+
+    <reference id="utx" interface="javax.transaction.UserTransaction"/>
+
+    <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+        filter="(osgi.unit.name=dcm4chee-arc)"/>
+
+</blueprint>

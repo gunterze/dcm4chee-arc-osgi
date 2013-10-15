@@ -1,0 +1,27 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <bean
+        class="org.dcm4chee.archive.store.scp.impl.CStoreSCP"
+        id="cstorescp"
+        activation="eager"
+        init-method="init"
+        destroy-method="destroy">
+        <property
+            name="archiveService"
+            ref="archiveService" />
+        <property
+            name="storeService"
+            ref="storeService" />
+    </bean>
+
+    <reference
+        id="archiveService"
+        interface="org.dcm4chee.archive.ArchiveService" />
+
+    <reference
+        id="storeService"
+        interface="org.dcm4chee.archive.store.StoreService" />
+
+</blueprint>

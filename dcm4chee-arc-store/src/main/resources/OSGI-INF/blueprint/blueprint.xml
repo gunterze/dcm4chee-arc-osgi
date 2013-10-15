@@ -4,29 +4,34 @@
 
     <service
         id="storeService"
-        interface="org.dcm4che.net.DimseRQHandler"
+        interface="org.dcm4chee.archive.store.StoreService"
         ref="storeServiceImpl" />
 
     <bean
-        class="org.dcm4chee.archive.store.impl.CStoreSCP"
-        id="storeServiceImpl"
-        activation="eager"
-        init-method="init"
-        destroy-method="destroy">
-        <property
-            name="archiveService"
-            ref="archiveService" />
-        <property
-            name="fileSystemService"
-            ref="fileSystemService" />
+        class="org.dcm4chee.archive.store.impl.StoreServiceImpl"
+        id="storeServiceImpl">
+        <property name="userTransaction" ref="utx"/>
+        <property name="entityManagerFactory" ref="emf"/>
+        <property name="patientService" ref="patientService"/>
+        <property name="issuerService" ref="issuerService"/>
+        <property name="codeService" ref="codeService"/>
     </bean>
 
-    <reference
-        id="archiveService"
-        interface="org.dcm4chee.archive.ArchiveService" />
+    <reference id="utx" interface="javax.transaction.UserTransaction"/>
+
+    <reference id="emf" interface="javax.persistence.EntityManagerFactory"
+        filter="(osgi.unit.name=dcm4chee-arc)"/>
 
     <reference
-        id="fileSystemService"
-        interface="org.dcm4chee.archive.fs.FileSystemService" />
+        id="patientService"
+        interface="org.dcm4chee.archive.patient.PatientService" />
+
+    <reference
+        id="issuerService"
+        interface="org.dcm4chee.archive.issuer.IssuerService" />
+
+    <reference
+        id="codeService"
+        interface="org.dcm4chee.archive.code.CodeService" />
 
 </blueprint>

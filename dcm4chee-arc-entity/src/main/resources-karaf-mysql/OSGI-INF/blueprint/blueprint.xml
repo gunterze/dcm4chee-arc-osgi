@@ -1,0 +1,35 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+  <bean
+    class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource"
+    id="mysqlDatasource">
+    <property
+      name="serverName"
+      value="localhost"></property>
+    <property
+      name="databaseName"
+      value="ARCHIVE"></property>
+    <property
+      name="port"
+      value="3306"></property>
+    <property
+      name="user"
+      value="root"></property>
+    <property
+      name="password"
+      value="password"></property>
+  </bean>
+
+  <service
+    id="mysqlDS"
+    interface="javax.sql.DataSource"
+    ref="mysqlDatasource">
+    <service-properties>
+      <entry
+        key="osgi.jndi.service.name"
+        value="PacsDS" />
+    </service-properties>
+  </service>
+  
+</blueprint>

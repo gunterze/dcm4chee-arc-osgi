@@ -11,8 +11,10 @@
     <slf4j.version>1.6.1</slf4j.version>
     <hibernate.version>4.0.1.Final</hibernate.version>
     <querydsl.version>2.8.1</querydsl.version>
-    <db>mysql</db>
+    <db>wildfly-mysql</db>
     <ds>java:/PacsDS</ds>
+    <!--db>karaf-mysql</db-->
+    <!--ds>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=PacsDS)</ds-->
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -141,13 +143,16 @@
     </dependencies>
   </dependencyManagement>
   <modules>
+    <module>dcm4chee-arc-code</module>
     <module>dcm4chee-arc-conf</module>
     <module>dcm4chee-arc-conf-ldap</module>
     <module>dcm4chee-arc-conf-prefs</module>
     <module>dcm4chee-arc-device</module>
     <module>dcm4chee-arc-entity</module>
-    <module>dcm4chee-arc-filesystem</module>
+    <module>dcm4chee-arc-issuer</module>
+    <module>dcm4chee-arc-patient</module>
     <module>dcm4chee-arc-store</module>
+    <module>dcm4chee-arc-store-scp</module>
   </modules>
   <build>
     <pluginManagement>

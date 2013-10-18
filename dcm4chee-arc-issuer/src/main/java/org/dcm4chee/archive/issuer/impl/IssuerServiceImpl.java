@@ -61,6 +61,7 @@ public class IssuerServiceImpl implements IssuerService {
 
     @Override
     public Issuer findOrCreate(Issuer issuer) {
+        
         try {
             Issuer result = findOrCreate(em, issuer);
             return result;

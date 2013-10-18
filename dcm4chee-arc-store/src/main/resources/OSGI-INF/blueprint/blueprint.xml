@@ -31,5 +31,4 @@
         id="codeService"
         interface="org.dcm4chee.archive.code.CodeService" />
 
-</
 </blueprint>

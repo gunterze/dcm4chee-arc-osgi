@@ -93,18 +93,13 @@ public class StoreServiceImpl implements StoreService {
 
     final static Logger LOG = LoggerFactory.getLogger(StoreService.class);
 
-    private EntityManagerFactory emf;
-    private UserTransaction utx;
+    private EntityManager em;
     private PatientService patientService;
     private IssuerService issuerService;
     private CodeService codeService;
 
-    public void setEntityManagerFactory(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-
-    public void setUserTransaction(UserTransaction utx) {
-        this.utx = utx;
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
     }
 
     public void setPatientService(PatientService patientService) {
@@ -122,18 +117,11 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public FileSystem selectStorageFileSystem(String groupID, String defaultURI)
         throws Exception {
-        EntityManager em = emf.createEntityManager();
         try {
-            utx.begin();
-            em.joinTransaction();
             FileSystem fs = selectStorageFileSystem(em, groupID, defaultURI);
-            utx.commit();
             return fs;
         } catch (Exception e) {
-            try { utx.rollback(); } catch (Exception ignore) {}
             throw e;
-        } finally {
-            em.close();
         }
     }
 
@@ -185,18 +173,11 @@ public class StoreServiceImpl implements StoreService {
     public boolean store(ArchiveAEExtension aeExt, String sourceAET,
             Attributes attrs, FileRef fileRef, Attributes modified)
                     throws Exception {
-        EntityManager em = emf.createEntityManager();
         try {
-            utx.begin();
-            em.joinTransaction();
             boolean store = store(em, aeExt, sourceAET, attrs, fileRef, modified);
-            utx.commit();
             return store;
         } catch (Exception e) {
-            try { utx.rollback(); } catch (Exception ignore) {}
             throw e;
-        } finally {
-            em.close();
         }
      }
 

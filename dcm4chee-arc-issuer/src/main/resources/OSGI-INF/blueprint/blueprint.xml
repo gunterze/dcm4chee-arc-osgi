@@ -1,6 +1,8 @@
 <blueprint
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" 
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
 
     <service
         id="issuerService"
@@ -10,13 +12,8 @@
     <bean
         class="org.dcm4chee.archive.issuer.impl.IssuerServiceImpl"
         id="issuerServiceImpl">
-        <property name="userTransaction" ref="utx"/>
-        <property name="entityManagerFactory" ref="emf"/>
+        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
+        <tx:transaction method="*" value="Required" />
     </bean>
-
-    <reference id="utx" interface="javax.transaction.UserTransaction"/>
-
-    <reference id="emf" interface="javax.persistence.EntityManagerFactory"
-        filter="(osgi.unit.name=dcm4chee-arc)"/>
 
 </blueprint>

@@ -53,37 +53,20 @@ import org.dcm4chee.archive.issuer.IssuerService;
  */
 public class IssuerServiceImpl implements IssuerService {
 
-    private EntityManagerFactory emf;
-    private UserTransaction utx;
+    private EntityManager em;
 
-    public void setEntityManagerFactory(EntityManagerFactory emf) {
-        this.emf = emf;
-    }
-
-    public void setUserTransaction(UserTransaction utx) {
-        this.utx = utx;
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public Issuer findOrCreate(Issuer issuer) {
-        EntityManager em = emf.createEntityManager();
         boolean commit = false;
         try {
-            if (utx.getStatus() == javax.transaction.Status.STATUS_NO_TRANSACTION) {
-                utx.begin();
-                commit = true;
-            }
-            em.joinTransaction();
             Issuer result = findOrCreate(em, issuer);
-            if (commit)
-                utx.commit();
             return result;
         } catch (Exception e) {
-            if (commit)
-                try { utx.rollback(); } catch (Exception ignore) {}
             throw new RuntimeException(e);
-        } finally {
-            em.close();
         }
     }
 

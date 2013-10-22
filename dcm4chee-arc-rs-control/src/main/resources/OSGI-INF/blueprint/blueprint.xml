@@ -1,0 +1,33 @@
+<blueprint
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+  xsi:schemaLocation="
+              http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+              http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <!-- The <jaxrs:server/> element is used to set up our JAX-RS services. 
+    It defines the server's address, '/rest', relative to the default Apache 
+    CXF servlet URI. With the default settings, the server will be running on 
+    'http://localhost:8181/cxf/dcm4che/archive' -->
+  <jaxrs:server
+    id="archiveService"
+    address="/dcm4che">
+    <jaxrs:serviceBeans>
+      <ref component-id="archiveRESTService" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
+  <bean
+    id="archiveRESTService"
+    class="org.dcm4chee.archive.rest.ArchiveServiceRS">
+    <property
+      name="archiveService"
+      ref="archiveOSGiService" />
+  </bean>
+
+  <reference
+    id="archiveOSGiService"
+    interface="org.dcm4chee.archive.ArchiveService" />
+
+</blueprint>

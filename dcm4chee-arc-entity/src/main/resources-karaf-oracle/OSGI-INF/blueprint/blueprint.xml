@@ -1,0 +1,23 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+  <bean
+    class="oracle.jdbc.pool.OracleDataSource"
+    id="oracleDatasource">
+      <property name="URL" value="jdbc:oracle:thin:@10.231.163.24:1521:xe"/>
+      <property name="user" value="pacs"/>
+      <property name="password" value="pacs"/>
+  </bean>
+
+  <service
+    id="oracleDS"
+    interface="javax.sql.DataSource"
+    ref="oracleDatasource">
+    <service-properties>
+      <entry
+        key="osgi.jndi.service.name"
+        value="PacsDS" />
+    </service-properties>
+  </service>
+  
+</blueprint>

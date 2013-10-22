@@ -25,12 +25,13 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
+          <classifier>${db}</classifier>        
           <instructions>
             <Import-Package>*,javassist.util.proxy,org.hibernate.proxy</Import-Package>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
           </instructions>
         </configuration>
-      </plugin>
+      </plugin>      
     </plugins>
   </build>
   <dependencies>

@@ -11,10 +11,10 @@
     <slf4j.version>1.6.1</slf4j.version>
     <hibernate.version>4.0.1.Final</hibernate.version>
     <querydsl.version>2.8.1</querydsl.version>
-    <db>wildfly-mysql</db>
-    <ds>java:/PacsDS</ds>
-    <!--db>karaf-mysql</db-->
-    <!--ds>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=PacsDS)</ds-->
+    <!--db>wildfly-mysql</db-->
+    <!--ds>java:/PacsDS</ds-->
+    <db>karaf-mysql</db>
+    <ds>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=PacsDS)</ds>
   </properties>
   <dependencyManagement>
     <dependencies>

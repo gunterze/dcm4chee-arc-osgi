@@ -41,10 +41,14 @@ package org.dcm4chee.archive.impl;
 import java.io.File;
 
 import org.dcm4che.conf.api.DicomConfiguration;
+import org.dcm4che.imageio.codec.ImageReaderFactory;
+import org.dcm4che.imageio.codec.ImageWriterFactory;
 import org.dcm4che.net.Device;
 import org.dcm4che.net.DeviceService;
 import org.dcm4che.net.hl7.HL7DeviceExtension;
 import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
+import org.dcm4che.net.imageio.ImageReaderExtension;
+import org.dcm4che.net.imageio.ImageWriterExtension;
 import org.dcm4che.net.service.BasicCEchoSCP;
 import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
@@ -112,7 +116,25 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
         device.setDimseRQHandler(serviceRegistry);
         device.getDeviceExtension(HL7DeviceExtension.class)
             .setHL7MessageListener(hl7ServiceRegistry);
+        initImageReaderFactory();
+        initImageWriterFactory();
         start();
+    }
+
+    private void initImageReaderFactory() {
+        ImageReaderExtension ext = device.getDeviceExtension(ImageReaderExtension.class);
+        if (ext != null)
+            ImageReaderFactory.setDefault(ext.getImageReaderFactory());
+        else
+            ImageReaderFactory.resetDefault();
+    }
+
+    private void initImageWriterFactory() {
+        ImageWriterExtension ext = device.getDeviceExtension(ImageWriterExtension.class);
+        if (ext != null)
+            ImageWriterFactory.setDefault(ext.getImageWriterFactory());
+        else
+            ImageWriterFactory.resetDefault();
     }
 
     public void destroy() {
@@ -123,6 +145,8 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     @Override
     public void reload() throws Exception {
         device.reconfigure(dicomConfig.findDevice(device.getDeviceName()));
+        initImageReaderFactory();
+        initImageWriterFactory();
         device.rebindConnections();
     }
 

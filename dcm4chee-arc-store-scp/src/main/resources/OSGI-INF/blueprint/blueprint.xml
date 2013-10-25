@@ -14,6 +14,9 @@
         <property
             name="storeService"
             ref="storeService" />
+        <property
+            name="compressionService"
+            ref="compressionService" />
     </bean>
 
     <reference
@@ -23,5 +26,9 @@
     <reference
         id="storeService"
         interface="org.dcm4chee.archive.store.StoreService" />
+
+    <reference
+        id="compressionService"
+        interface="org.dcm4chee.archive.compress.CompressionService" />
 
 </blueprint>

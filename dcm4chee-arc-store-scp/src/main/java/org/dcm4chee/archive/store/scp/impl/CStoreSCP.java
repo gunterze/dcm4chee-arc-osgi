@@ -50,8 +50,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.dcm4che.data.Attributes;
+import org.dcm4che.data.BulkData;
 import org.dcm4che.data.Tag;
 import org.dcm4che.data.UID;
+import org.dcm4che.imageio.codec.CompressionRule;
 import org.dcm4che.io.DicomInputStream;
 import org.dcm4che.io.DicomInputStream.IncludeBulkData;
 import org.dcm4che.io.DicomOutputStream;
@@ -65,6 +67,7 @@ import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.util.AttributesFormat;
 import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.ArchiveService;
+import org.dcm4chee.archive.compress.CompressionService;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.FileRef;
 import org.dcm4chee.archive.entity.FileSystem;
@@ -78,6 +81,7 @@ public class CStoreSCP extends BasicCStoreSCP {
 
     private ArchiveService archiveService;
     private StoreService storeService;
+    private CompressionService compressionService;
 
     public CStoreSCP() {
         super("*");
@@ -97,6 +101,14 @@ public class CStoreSCP extends BasicCStoreSCP {
 
     public void setStoreService(StoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public CompressionService getCompressionService() {
+        return compressionService;
+    }
+
+    public void setCompressionService(CompressionService compressionService) {
+        this.compressionService = compressionService;
     }
 
     public void init() {
@@ -128,13 +140,33 @@ public class CStoreSCP extends BasicCStoreSCP {
             MessageDigest digest = messageDigestOf(aeExt);
             storeTo(as, fmi, data, spoolFile, digest);
             Attributes attrs = parse(spoolFile);
-            String filePath = createFilePath(aeExt, attrs);
-            tmpPath = move(tmpPath, fsPath, filePath);
+            String filePathStr = createFilePath(aeExt, attrs);
+            Path filePath = fsPath.resolve(filePathStr);
+            Files.createDirectories(filePath.getParent());
+            CompressionRule compressionRule =
+                    findCompressionRules(aeExt, sourceAET, attrs);
+            if (compressionRule != null) {
+                try {
+                    filePath = createUniqueFile(filePath);
+                    MessageDigest digest2 = messageDigestOf(aeExt);
+                    compressionService.compress(compressionRule, spoolFile,
+                            filePath.toFile(), digest2,
+                            fmi, attrs);
+                    Files.delete(tmpPath);
+                    tmpPath = filePath;
+                    digest = digest2;
+                } catch (IOException e) {
+                    Files.delete(filePath);
+                    tmpPath = move(tmpPath, fsPath, filePath);
+                }
+            } else {
+                tmpPath = move(tmpPath, fsPath, filePath);
+            }
             File file = tmpPath.toFile();
             FileRef fileRef = new FileRef(
                     fs,
-                    filePath,
-                    tsuid,
+                    filePathStr,
+                    fmi.getString(Tag.TransferSyntaxUID),
                     file.length(), 
                     digest(digest));
             Attributes modified = new Attributes();
@@ -158,6 +190,14 @@ public class CStoreSCP extends BasicCStoreSCP {
         }
     }
 
+    private static CompressionRule findCompressionRules(ArchiveAEExtension aeExt,
+            String sourceAET, Attributes attrs) {
+        if (!(attrs.getValue(Tag.PixelData) instanceof BulkData))
+            return null;
+
+        return aeExt.getCompressionRules().findCompressionRule(sourceAET, attrs);
+    }
+
     private String digest(MessageDigest digest) {
         return digest != null ? TagUtils.toHexString(digest.digest()) : null;
     }
@@ -175,19 +215,29 @@ public class CStoreSCP extends BasicCStoreSCP {
         }
     }
 
-    private Path move(Path spoolPath, Path fsPath, String filePath)
-            throws Exception {
-        Path path = fsPath.resolve(filePath);
-        Files.createDirectories(path.getParent());
+    private Path move(Path spoolPath, Path fsPath, Path target)
+            throws IOException {
         for (;;) {
             try {
-                return Files.move(spoolPath, path);
+                return Files.move(spoolPath, target);
+            } catch (FileAlreadyExistsException e) {
+                target = target.resolveSibling(
+                        target.getFileName().toString() + '-');
+            }
+        }
+    }
+
+    private Path createUniqueFile(Path path) throws IOException {
+        for (;;) {
+            try {
+                return Files.createFile(path);
             } catch (FileAlreadyExistsException e) {
                 path = path.resolveSibling(
                         path.getFileName().toString() + '-');
             }
         }
     }
+
 
     private Attributes parse(File file) throws IOException {
         try (DicomInputStream in = new DicomInputStream(file)) {

@@ -9,16 +9,16 @@
       value="localhost"></property>
     <property
       name="databaseName"
-      value="ARCHIVE"></property>
+      value="pacsdb4"></property>
     <property
       name="port"
       value="3306"></property>
     <property
       name="user"
-      value="root"></property>
+      value="pacs"></property>
     <property
       name="password"
-      value="password"></property>
+      value="pacs"></property>
   </bean>
 
   <service

@@ -55,9 +55,11 @@
         <configuration>
           <classifier>${db}</classifier>
           <instructions>
-            <Import-Package>*,javassist.util.proxy,org.hibernate.proxy</Import-Package>
+            <Import-Package>*,org.dcm4che.data,javassist.util.proxy,org.hibernate.proxy</Import-Package>
+            <Export-Package>org.dcm4chee.archive.entity</Export-Package>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
           </instructions>
+          <excludeDependencies>true</excludeDependencies>
         </configuration>
       </plugin>
       <plugin>

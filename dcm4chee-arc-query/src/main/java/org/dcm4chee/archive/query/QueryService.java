@@ -36,23 +36,31 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.query;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4che.data.IDWithIssuer;
+import org.dcm4che.net.service.QueryRetrieveLevel;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface StoreService {
+public interface QueryService {
 
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws Exception;
+    Query createQuery(QueryRetrieveLevel qrlevel, IDWithIssuer[] pids,
+            Attributes keys, QueryParam queryParam) throws Exception;
 
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws Exception;
+    Query createPatientQuery(IDWithIssuer[] pids, Attributes keys,
+            QueryParam queryParam) throws Exception;
 
-    
+    Query createStudyQuery(IDWithIssuer[] pids, Attributes keys,
+            QueryParam queryParam) throws Exception;
+
+    Query createSeriesQuery(IDWithIssuer[] pids, Attributes keys,
+            QueryParam queryParam) throws Exception;
+
+    Query createInstanceQuery(IDWithIssuer[] pids, Attributes keys,
+            QueryParam queryParam) throws Exception;
+
 }

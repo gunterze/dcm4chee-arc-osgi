@@ -39,7 +39,8 @@
 package org.dcm4chee.archive.patient;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
+import org.dcm4che.soundex.FuzzyStr;
+import org.dcm4chee.archive.conf.AttributeFilter;
 import org.dcm4chee.archive.entity.Patient;
 
 /**
@@ -48,7 +49,8 @@ import org.dcm4chee.archive.entity.Patient;
  */
 public interface PatientService {
 
-    Patient findUniqueOrCreatePatient(ArchiveDeviceExtension devExt,
+    Patient findUniqueOrCreatePatient(
+            AttributeFilter filter, FuzzyStr fuzzyStr,
             Attributes data, boolean followMergedWith, boolean mergeAttributes);
 
 }

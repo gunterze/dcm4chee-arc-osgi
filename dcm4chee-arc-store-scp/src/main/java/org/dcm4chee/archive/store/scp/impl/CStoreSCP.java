@@ -71,6 +71,7 @@ import org.dcm4chee.archive.compress.CompressionService;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.FileRef;
 import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4chee.archive.store.StoreParam;
 import org.dcm4chee.archive.store.StoreService;
 
 /**
@@ -170,7 +171,8 @@ public class CStoreSCP extends BasicCStoreSCP {
                     file.length(), 
                     digest(digest));
             Attributes modified = new Attributes();
-            if (storeService.store(aeExt, sourceAET, attrs, fileRef, modified)) {
+            if (storeService.store(StoreParam.valueOf(aeExt), 
+                    sourceAET, attrs, fileRef, modified)) {
                 tmpPath = null;
             }
         } catch (Exception e) {

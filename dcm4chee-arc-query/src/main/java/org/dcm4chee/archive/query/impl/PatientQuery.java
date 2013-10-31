@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,23 +36,50 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.query.impl;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4che.data.IDWithIssuer;
+import org.dcm4chee.archive.entity.query.types.QPatient;
+import org.dcm4chee.archive.entity.Utils;
+import org.hibernate.ScrollableResults;
+
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.jpa.hibernate.HibernateQuery;
+import com.mysema.query.types.Expression;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
  */
-public interface StoreService {
+class PatientQuery extends AbstractQuery {
 
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws Exception;
+    private static final Expression<?>[] SELECT = {
+        QPatient.patient.pk,
+        QPatient.patient.encodedAttributes
+    };
 
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws Exception;
+    public PatientQuery(QueryServiceImpl qsf) {
+        super(qsf);
+    }
 
-    
+    @Override
+    protected Expression<?>[] select() {
+        return SELECT;
+    }
+
+    @Override
+    protected HibernateQuery createQuery(IDWithIssuer[] pids, Attributes keys) {
+        BooleanBuilder builder = new BooleanBuilder();
+        Builder.addPatientLevelPredicates(builder, pids, keys, queryParam);
+        return new HibernateQuery(session)
+            .from(QPatient.patient)
+            .where(builder);
+    }
+
+    @Override
+    public Attributes toAttributes(ScrollableResults results) {
+        Attributes attrs = new Attributes();
+        Utils.decodeAttributes(attrs, results.getBinary(1));
+        return attrs;
+    }
 }

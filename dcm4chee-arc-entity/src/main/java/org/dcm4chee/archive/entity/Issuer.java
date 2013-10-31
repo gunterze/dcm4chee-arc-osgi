@@ -95,8 +95,8 @@ public class Issuer extends org.dcm4che.data.Issuer {
         super(item);
     }
 
-    public Issuer(String issuerOfPatientID, Attributes item) {
-        super(issuerOfPatientID, item);
+    public Issuer(String issuerOfPatientID, Attributes qualifier) {
+        super(issuerOfPatientID, qualifier);
     }
 
     public Issuer(org.dcm4che.data.Issuer other) {

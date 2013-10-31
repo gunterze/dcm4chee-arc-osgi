@@ -152,6 +152,8 @@
     <module>dcm4chee-arc-entity</module>
     <module>dcm4chee-arc-issuer</module>
     <module>dcm4chee-arc-patient</module>
+    <module>dcm4chee-arc-query</module>
+    <module>dcm4chee-arc-query-scp</module>
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
     <module>dcm4chee-arc-rs-control</module>

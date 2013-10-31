@@ -44,19 +44,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
-import javax.transaction.UserTransaction;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
+import org.dcm4che.data.IDWithIssuer;
+import org.dcm4che.soundex.FuzzyStr;
 import org.dcm4chee.archive.conf.AttributeFilter;
-import org.dcm4chee.archive.conf.Entity;
 import org.dcm4chee.archive.entity.Issuer;
 import org.dcm4chee.archive.entity.Patient;
-import org.dcm4chee.archive.issuer.IDWithIssuer;
 import org.dcm4chee.archive.issuer.IssuerService;
 import org.dcm4chee.archive.patient.PatientCircularMergedException;
 import org.dcm4chee.archive.patient.PatientMergedException;
@@ -80,11 +77,12 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Patient findUniqueOrCreatePatient(ArchiveDeviceExtension devExt,
+    public Patient findUniqueOrCreatePatient(
+            AttributeFilter filter, FuzzyStr fuzzyStr,
             Attributes data, boolean followMergedWith, boolean mergeAttributes) {
         try {
-            Patient patient = findUniqueOrCreatePatient(em, devExt, data,
-                    followMergedWith, mergeAttributes);
+            Patient patient = findUniqueOrCreatePatient(em, filter, fuzzyStr,
+                    data, followMergedWith, mergeAttributes);
             return patient;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -92,11 +90,11 @@ public class PatientServiceImpl implements PatientService {
     }
 
     private Patient findUniqueOrCreatePatient(EntityManager em,
-            ArchiveDeviceExtension devExt, Attributes data,
+            AttributeFilter filter, FuzzyStr fuzzyStr, Attributes data,
             boolean followMergedWith, boolean mergeAttributes) {
-        IDWithIssuer pid = IDWithIssuer.pidWithIssuer(data, null);
+        IDWithIssuer pid = IDWithIssuer.fromPatientIDWithIssuer(data);
         if (pid == null)
-            return createNewPatient(em, devExt, data, null);
+            return createNewPatient(em, filter, fuzzyStr, data, null);
 
         Patient patient;
         try {
@@ -109,11 +107,11 @@ public class PatientServiceImpl implements PatientService {
                     throw new PatientMergedException(
                             "" + patient + " merged with " + mergedWith);
             if (mergeAttributes)
-                mergeAttributes(devExt, patient, data, pid);
+                mergeAttributes(filter, fuzzyStr, patient, data, pid);
         } catch (NonUniqueResultException e) {
-            patient = createNewPatient(em, devExt, data, pid);
+            patient = createNewPatient(em, filter, fuzzyStr, data, pid);
         } catch (NoResultException e) {
-            patient = createNewPatient(em, devExt, data, pid);
+            patient = createNewPatient(em, filter, fuzzyStr, data, pid);
             // TO DO check if patient was inserted concurrently
         }
         return patient;
@@ -134,50 +132,47 @@ public class PatientServiceImpl implements PatientService {
     }
 
     private Issuer findOrCreateIssuer(IDWithIssuer pid) {
-        if (pid == null || pid.issuer == null)
+        if (pid == null || pid.getIssuer() == null)
             return null;
 
-        return issuerService.findOrCreate(new Issuer(pid.issuer));
+        return issuerService.findOrCreate(new Issuer(pid.getIssuer()));
     }
 
-    private void mergeAttributes(ArchiveDeviceExtension devExt,
+    private void mergeAttributes(AttributeFilter filter, FuzzyStr fuzzyStr,
             Patient patient, Attributes data, IDWithIssuer pid) {
         Attributes patientAttrs = patient.getAttributes();
-        AttributeFilter filter = devExt.getAttributeFilter(Entity.Patient);
         if (patientAttrs.mergeSelected(data, filter.getSelection())) {
             if (patient.getIssuerOfPatientID() == null) {
                 patient.setIssuerOfPatientID(findOrCreateIssuer(pid));
             }
-            patient.setAttributes(patientAttrs, filter, devExt.getFuzzyStr());
+            patient.setAttributes(patientAttrs, filter, fuzzyStr);
         }
     }
 
     private Patient createNewPatient(EntityManager em,
-            ArchiveDeviceExtension devExt, Attributes attrs,
-            IDWithIssuer pid) {
+            AttributeFilter filter, FuzzyStr fuzzyStr,
+            Attributes attrs, IDWithIssuer pid) {
         Patient patient = new Patient();
         patient.setIssuerOfPatientID(findOrCreateIssuer(pid));
-        patient.setAttributes(attrs,
-                devExt.getAttributeFilter(Entity.Patient),
-                devExt.getFuzzyStr());
+        patient.setAttributes(attrs, filter, fuzzyStr);
         em.persist(patient);
         return patient;
     }
 
     private List<Patient> findPatients(EntityManager em, IDWithIssuer pid) {
-        if (pid.id == null)
+        if (pid.getID() == null)
             throw new IllegalArgumentException("Missing pid");
 
         TypedQuery<Patient> query = em.createNamedQuery(
                     Patient.FIND_BY_PATIENT_ID, Patient.class)
-                .setParameter(1, pid.id);
+                .setParameter(1, pid.getID());
         List<Patient> list = query.getResultList();
-        if (pid.issuer != null) {
+        if (pid.getIssuer() != null) {
             for (Iterator<Patient> it = list.iterator(); it.hasNext();) {
                 Patient pat = (Patient) it.next();
                 Issuer issuer2 = pat.getIssuerOfPatientID();
                 if (issuer2 != null) {
-                    if (issuer2.matches(pid.issuer))
+                    if (issuer2.matches(pid.getIssuer()))
                         return Collections.singletonList(pat);
                     else
                         it.remove();

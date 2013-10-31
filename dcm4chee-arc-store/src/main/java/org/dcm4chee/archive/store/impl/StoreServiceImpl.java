@@ -45,13 +45,12 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
-import javax.transaction.UserTransaction;
 
 import org.dcm4che.data.Attributes;
+import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.data.Sequence;
 import org.dcm4che.data.Tag;
 import org.dcm4che.data.VR;
@@ -61,8 +60,6 @@ import org.dcm4che.soundex.FuzzyStr;
 import org.dcm4che.util.StringUtils;
 import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.code.CodeService;
-import org.dcm4chee.archive.conf.ArchiveAEExtension;
-import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
 import org.dcm4chee.archive.conf.AttributeFilter;
 import org.dcm4chee.archive.conf.Entity;
 import org.dcm4chee.archive.conf.StoreDuplicate;
@@ -78,9 +75,9 @@ import org.dcm4chee.archive.entity.Patient;
 import org.dcm4chee.archive.entity.Series;
 import org.dcm4chee.archive.entity.Study;
 import org.dcm4chee.archive.entity.VerifyingObserver;
-import org.dcm4chee.archive.issuer.IDWithIssuer;
 import org.dcm4chee.archive.issuer.IssuerService;
 import org.dcm4chee.archive.patient.PatientService;
+import org.dcm4chee.archive.store.StoreParam;
 import org.dcm4chee.archive.store.StoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,29 +167,27 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public boolean store(ArchiveAEExtension aeExt, String sourceAET,
+    public boolean store(StoreParam storeParam, String sourceAET,
             Attributes attrs, FileRef fileRef, Attributes modified)
                     throws Exception {
         try {
-            boolean store = store(em, aeExt, sourceAET, attrs, fileRef, modified);
+            boolean store = store(em, storeParam, sourceAET, attrs, fileRef, modified);
             return store;
         } catch (Exception e) {
             throw e;
         }
      }
 
-    private boolean store(EntityManager em, ArchiveAEExtension aeExt,
+    private boolean store(EntityManager em, StoreParam storeParam,
             String sourceAET, Attributes data, FileRef fileRef,
             Attributes modified) throws DicomServiceException {
         try {
-            ArchiveDeviceExtension devExt = aeExt.getApplicationEntity()
-                    .getDevice().getDeviceExtension(ArchiveDeviceExtension.class);
             Availability availability = fileRef.getFileSystem().getAvailability();
             Instance inst;
             try {
                 inst = findInstance(em, data.getString(Tag.SOPInstanceUID, null));
                 StoreDuplicate.Action storeDuplicate =
-                        storeDuplicate(aeExt.getStoreDuplicates(), inst, fileRef);
+                        storeDuplicate(storeParam.getStoreDuplicates(), inst, fileRef);
                 switch (inst.getAvailability()) {
                 case REJECTED_FOR_QUALITY_REASONS_REJECTION_NOTE:
                 case REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE:
@@ -215,17 +210,17 @@ public class StoreServiceImpl implements StoreService {
                     coerceAttributes(inst, data, modified);
                     return false;
                 case STORE:
-                    updateInstance(devExt, inst, data, modified);
+                    updateInstance(storeParam, inst, data, modified);
                     coerceAttributes(inst.getSeries(), data, modified);
                     break;
                 case REPLACE:
                     inst.setReplaced(true);
-                    inst = newInstance(em, devExt, aeExt, sourceAET, data,
+                    inst = newInstance(em, storeParam, sourceAET, data,
                             availability, modified);
                     break;
                 }
             } catch (NoResultException e) {
-                inst = newInstance(em, devExt, aeExt, sourceAET, data,
+                inst = newInstance(em, storeParam, sourceAET, data,
                         availability, modified);
             }
             fileRef.setInstance(inst);
@@ -263,13 +258,13 @@ public class StoreServiceImpl implements StoreService {
         return StoreDuplicate.Action.IGNORE;
     }
 
-    private static void updateInstance(ArchiveDeviceExtension devExt,
+    private static void updateInstance(StoreParam storeParam,
             Instance inst, Attributes data, Attributes modified) {
         Attributes instAttrs = inst.getAttributes();
-        final AttributeFilter filter = devExt.getAttributeFilter(Entity.Instance);
+        final AttributeFilter filter = storeParam.getAttributeFilter(Entity.Instance);
         Attributes updated = new Attributes();
         if (instAttrs.updateSelected(data, updated, filter.getSelection())) {
-            inst.setAttributes(data, filter, devExt.getFuzzyStr());
+            inst.setAttributes(data, filter, storeParam.getFuzzyStr());
         }
     }
 
@@ -288,8 +283,7 @@ public class StoreServiceImpl implements StoreService {
         data.update(series.getAttributes(), modified);
     }
 
-    private Instance newInstance(EntityManager em,
-            ArchiveDeviceExtension devExt, ArchiveAEExtension aeExt,
+    private Instance newInstance(EntityManager em, StoreParam storeParam,
             String sourceAET, Attributes data, Availability availability,
             Attributes modified) throws DicomServiceException {
 //        Availability rnAvailability =
@@ -297,20 +291,20 @@ public class StoreServiceImpl implements StoreService {
 //        if (rnAvailability != null) {
 //            processRejectionNote(data, rnAvailability);
 //        }
-        Series series = findOrCreateSeries(em, devExt, aeExt, sourceAET, data,
+        Series series = findOrCreateSeries(em, storeParam, sourceAET, data,
                 availability);
 //        Availability availability = rnAvailability != null
 //                    ? Availability.availabilityOfRejectedObject(rnAvailability)
 //                    : fsAvailability;
         coerceAttributes(series, data, modified);
-        if (!modified.isEmpty() && aeExt.isStoreOriginalAttributes()) {
+        if (!modified.isEmpty() && storeParam.isStoreOriginalAttributes()) {
             Attributes item = new Attributes(4);
             Sequence origAttrsSeq =
                     data.ensureSequence(Tag.OriginalAttributesSequence, 1);
             origAttrsSeq.add(item);
             item.setDate(Tag.AttributeModificationDateTime, VR.DT, new Date());
             item.setString(Tag.ModifyingSystem, VR.LO,
-                    aeExt.getModifyingSystem());
+                    storeParam.getModifyingSystem());
             item.setString(Tag.SourceOfPreviousValues, VR.LO, sourceAET);
             item.newSequence(Tag.ModifiedAttributesSequence, 1).add(modified);
         }
@@ -319,21 +313,20 @@ public class StoreServiceImpl implements StoreService {
         inst.setConceptNameCode(singleCode(data, Tag.ConceptNameCodeSequence));
         inst.setVerifyingObservers(createVerifyingObservers(
                 data.getSequence(Tag.VerifyingObserverSequence),
-                devExt.getFuzzyStr()));
+                storeParam.getFuzzyStr()));
         inst.setContentItems(
                 createContentItems(data.getSequence(Tag.ContentSequence)));
-        inst.setRetrieveAETs(aeExt.getRetrieveAETs());
-        inst.setExternalRetrieveAET(aeExt.getExternalRetrieveAET());
+        inst.setRetrieveAETs(storeParam.getRetrieveAETs());
+        inst.setExternalRetrieveAET(storeParam.getExternalRetrieveAET());
         inst.setAvailability(availability);
         inst.setAttributes(data,
-                devExt.getAttributeFilter(Entity.Instance),
-                devExt.getFuzzyStr());
+                storeParam.getAttributeFilter(Entity.Instance),
+                storeParam.getFuzzyStr());
         em.persist(inst);
         return inst;
     }
 
-    private Series findOrCreateSeries(EntityManager em,
-            ArchiveDeviceExtension devExt, ArchiveAEExtension aeExt,
+    private Series findOrCreateSeries(EntityManager em, StoreParam storeParam,
             String sourceAET, Attributes data, Availability availability)
                     throws DicomServiceException {
         String seriesIUID = data.getString(Tag.SeriesInstanceUID);
@@ -344,7 +337,7 @@ public class StoreServiceImpl implements StoreService {
             series = findSeries(em, seriesIUID);
         } catch (NoResultException e) {
             series = new Series();
-            Study study = findOrCreateStudy(em, devExt, aeExt, data,
+            Study study = findOrCreateStudy(em, storeParam, data,
                     availability);
             series.setStudy(study);
             series.setInstitutionCode(
@@ -354,94 +347,93 @@ public class StoreServiceImpl implements StoreService {
 //                            data.getSequence(Tag.RequestAttributesSequence),
 //                            data, study.getPatient(), storeParam));
             series.setSourceAET(sourceAET);
-            series.setRetrieveAETs(aeExt.getRetrieveAETs());
-            series.setExternalRetrieveAET(aeExt.getExternalRetrieveAET());
+            series.setRetrieveAETs(storeParam.getRetrieveAETs());
+            series.setExternalRetrieveAET(storeParam.getExternalRetrieveAET());
             series.setAvailability(availability);
             series.setAttributes(data,
-                    devExt.getAttributeFilter(Entity.Series),
-                    devExt.getFuzzyStr());
+                    storeParam.getAttributeFilter(Entity.Series),
+                    storeParam.getFuzzyStr());
             em.persist(series);
             return series;
         }
         Study study = series.getStudy();
-        mergeSeriesAttributes(devExt, aeExt, series, data, availability);
-        mergeStudyAttributes(devExt, aeExt, study, data, availability);
-        mergePatientAttributes(devExt, study.getPatient(), data);
+        mergeSeriesAttributes(storeParam, series, data, availability);
+        mergeStudyAttributes(storeParam, study, data, availability);
+        mergePatientAttributes(storeParam, study.getPatient(), data);
         return series;
     }
 
-    private void mergePatientAttributes(ArchiveDeviceExtension devExt,
+    private void mergePatientAttributes(StoreParam storeParam,
             Patient patient, Attributes data) {
         Attributes patientAttrs = patient.getAttributes();
-        AttributeFilter filter = devExt.getAttributeFilter(Entity.Patient);
+        AttributeFilter filter = storeParam.getAttributeFilter(Entity.Patient);
         if (patientAttrs.mergeSelected(data, filter.getSelection())) {
             if (patient.getIssuerOfPatientID() == null) {
-                IDWithIssuer pid = IDWithIssuer.pidWithIssuer(data, null);
-                if (pid != null && pid.issuer != null) {
+                IDWithIssuer pid = IDWithIssuer.fromPatientIDWithIssuer(data);
+                if (pid != null && pid.getIssuer() != null) {
                     patient.setIssuerOfPatientID(
-                            issuerService.findOrCreate(new Issuer(pid.issuer)));
+                            issuerService.findOrCreate(new Issuer(pid.getIssuer())));
                 }
             }
-            patient.setAttributes(patientAttrs, filter, devExt.getFuzzyStr());
+            patient.setAttributes(patientAttrs, filter, storeParam.getFuzzyStr());
         }
     }
 
-    private void mergeSeriesAttributes(ArchiveDeviceExtension devExt,
-            ArchiveAEExtension aeExt, Series series, Attributes data,
-            Availability availability) {
-        series.retainRetrieveAETs(aeExt.getRetrieveAETs());
-        series.retainExternalRetrieveAET(aeExt.getExternalRetrieveAET());
+    private void mergeSeriesAttributes(StoreParam storeParam,
+            Series series, Attributes data, Availability availability) {
+        series.retainRetrieveAETs(storeParam.getRetrieveAETs());
+        series.retainExternalRetrieveAET(storeParam.getExternalRetrieveAET());
         series.floorAvailability(availability);
         series.resetNumberOfInstances();
         Attributes seriesAttrs = series.getAttributes();
-        AttributeFilter seriesFilter = devExt.getAttributeFilter(Entity.Series);
+        AttributeFilter seriesFilter = storeParam.getAttributeFilter(Entity.Series);
         if (seriesAttrs.mergeSelected(data, seriesFilter.getSelection())) {
-            series.setAttributes(seriesAttrs, seriesFilter, devExt.getFuzzyStr());
+            series.setAttributes(seriesAttrs, seriesFilter, storeParam.getFuzzyStr());
         }
     }
 
-    private Study findOrCreateStudy(EntityManager em,
-            ArchiveDeviceExtension devExt, ArchiveAEExtension aeExt,
+    private Study findOrCreateStudy(EntityManager em, StoreParam storeParam,
             Attributes data, Availability availability) {
         Study study;
         try {
             study = findStudy(em, data.getString(Tag.StudyInstanceUID));
-            mergeStudyAttributes(devExt, aeExt, study, data, availability);
-            mergePatientAttributes(devExt, study.getPatient(), data);
+            mergeStudyAttributes(storeParam, study, data, availability);
+            mergePatientAttributes(storeParam, study.getPatient(), data);
         } catch (NoResultException e) {
             study = new Study();
             Patient patient = patientService.findUniqueOrCreatePatient(
-                    devExt, data, true, true);
+                    storeParam.getAttributeFilter(Entity.Patient),
+                    storeParam.getFuzzyStr(),
+                    data, true, true);
             study.setPatient(patient);
             study.setProcedureCodes(codeList(data, Tag.ProcedureCodeSequence));
             study.setIssuerOfAccessionNumber(issuer(
                     data.getNestedDataset(Tag.IssuerOfAccessionNumberSequence)));
             study.setModalitiesInStudy(data.getString(Tag.Modality, null));
             study.setSOPClassesInStudy(data.getString(Tag.SOPClassUID, null));
-            study.setRetrieveAETs(aeExt.getRetrieveAETs());
-            study.setExternalRetrieveAET(aeExt.getExternalRetrieveAET());
+            study.setRetrieveAETs(storeParam.getRetrieveAETs());
+            study.setExternalRetrieveAET(storeParam.getExternalRetrieveAET());
             study.setAvailability(availability);
             study.setAttributes(data, 
-                    devExt.getAttributeFilter(Entity.Study),
-                    devExt.getFuzzyStr());
+                    storeParam.getAttributeFilter(Entity.Study),
+                    storeParam.getFuzzyStr());
             em.persist(study);
         }
         return study;
     }
 
-    private void mergeStudyAttributes(ArchiveDeviceExtension devExt,
-            ArchiveAEExtension aeExt,
+    private void mergeStudyAttributes(StoreParam storeParam,
             Study study, Attributes data, Availability availability) {
         study.addModalityInStudy(data.getString(Tag.Modality, null));
         study.addSOPClassInStudy(data.getString(Tag.SOPClassUID, null));
-        study.retainRetrieveAETs(aeExt.getRetrieveAETs());
-        study.retainExternalRetrieveAET(aeExt.getExternalRetrieveAET());
+        study.retainRetrieveAETs(storeParam.getRetrieveAETs());
+        study.retainExternalRetrieveAET(storeParam.getExternalRetrieveAET());
         study.floorAvailability(availability);
         study.resetNumberOfInstances();
-        AttributeFilter studyFilter = devExt.getAttributeFilter(Entity.Study);
+        AttributeFilter studyFilter = storeParam.getAttributeFilter(Entity.Study);
         Attributes studyAttrs = study.getAttributes();
         if (studyAttrs.mergeSelected(data, studyFilter.getSelection())) {
-            study.setAttributes(studyAttrs, studyFilter, devExt.getFuzzyStr());
+            study.setAttributes(studyAttrs, studyFilter, storeParam.getFuzzyStr());
         }
     }
 

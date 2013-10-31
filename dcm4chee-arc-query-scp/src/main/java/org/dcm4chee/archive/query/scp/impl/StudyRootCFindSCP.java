@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,23 +36,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.query.scp.impl;
 
-import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4che.data.UID;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
  */
-public interface StoreService {
-
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws Exception;
-
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws Exception;
-
-    
+public class StudyRootCFindSCP  extends CFindSCP {
+    public StudyRootCFindSCP () {
+        super(UID.StudyRootQueryRetrieveInformationModelFIND,
+                "STUDY", "SERIES", "IMAGE");
+    }
 }

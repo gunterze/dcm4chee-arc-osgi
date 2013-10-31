@@ -36,23 +36,38 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.query;
+
+import java.sql.SQLException;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4che.data.IDWithIssuer;
+
+import com.mysema.query.types.OrderSpecifier;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface StoreService {
+public interface Query {
 
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws Exception;
+    void executeQuery();
 
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws Exception;
+    long count();
 
-    
+    void limit(long limit);
+
+    void offset(long offset);
+
+    void orderBy(OrderSpecifier<?>... orderSpecifiers);
+
+    boolean optionalKeyNotSupported();
+
+    boolean hasMoreMatches();
+
+    Attributes nextMatch();
+
+    String[] patientNamesOf(IDWithIssuer[] pids);
+
+    void close() throws SQLException;
 }

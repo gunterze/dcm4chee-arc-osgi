@@ -124,6 +124,7 @@ public class QueryServiceImpl implements QueryService {
         
         Session s = em.unwrap(Session.class);
         return s.getSessionFactory().openStatelessSession(connection);
+
     }
 
     @Override

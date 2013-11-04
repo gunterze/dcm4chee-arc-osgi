@@ -36,25 +36,23 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
+package org.dcm4chee.archive.request;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4chee.archive.common.StoreParam;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+import org.dcm4chee.archive.entity.Patient;
+import org.dcm4chee.archive.entity.ScheduledProcedureStep;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface StoreService {
+public interface RequestService {
 
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws DicomServiceException;
+    ScheduledProcedureStep createScheduledProcedureStep(Attributes attrs,
+            Patient patient, StoreParam storeParam);
 
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws DicomServiceException;
+    ScheduledProcedureStep findOrCreateScheduledProcedureStep(Attributes attrs,
+            Patient patient, StoreParam storeParam);
 
-    
 }

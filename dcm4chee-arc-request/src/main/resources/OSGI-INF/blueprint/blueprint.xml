@@ -1,0 +1,24 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"    
+    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" 
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+    
+    <service
+        id="requestService"
+        interface="org.dcm4chee.archive.request.RequestService"
+        ref="requestServiceImpl" />
+
+    <bean
+        class="org.dcm4chee.archive.request.impl.RequestServiceImpl"
+        id="requestServiceImpl">
+        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
+        <tx:transaction method="*" value="Required" />
+        <property name="issuerService" ref="issuerService"/>
+    </bean>
+    
+    <reference
+        id="issuerService"
+        interface="org.dcm4chee.archive.issuer.IssuerService" />
+
+</blueprint>

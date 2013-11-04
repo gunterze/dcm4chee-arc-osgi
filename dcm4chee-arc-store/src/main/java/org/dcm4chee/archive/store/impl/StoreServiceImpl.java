@@ -60,6 +60,7 @@ import org.dcm4che.soundex.FuzzyStr;
 import org.dcm4che.util.StringUtils;
 import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.code.CodeService;
+import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.conf.AttributeFilter;
 import org.dcm4chee.archive.conf.Entity;
 import org.dcm4chee.archive.conf.StoreDuplicate;
@@ -72,12 +73,13 @@ import org.dcm4chee.archive.entity.FileSystemStatus;
 import org.dcm4chee.archive.entity.Instance;
 import org.dcm4chee.archive.entity.Issuer;
 import org.dcm4chee.archive.entity.Patient;
+import org.dcm4chee.archive.entity.ScheduledProcedureStep;
 import org.dcm4chee.archive.entity.Series;
 import org.dcm4chee.archive.entity.Study;
 import org.dcm4chee.archive.entity.VerifyingObserver;
 import org.dcm4chee.archive.issuer.IssuerService;
 import org.dcm4chee.archive.patient.PatientService;
-import org.dcm4chee.archive.store.StoreParam;
+import org.dcm4chee.archive.request.RequestService;
 import org.dcm4chee.archive.store.StoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +95,7 @@ public class StoreServiceImpl implements StoreService {
     private EntityManager em;
     private PatientService patientService;
     private IssuerService issuerService;
+    private RequestService requestService;
     private CodeService codeService;
 
     public void setEntityManager(EntityManager em) {
@@ -111,19 +114,13 @@ public class StoreServiceImpl implements StoreService {
         this.codeService = codeService;
     }
 
-    @Override
-    public FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-        throws Exception {
-        try {
-            FileSystem fs = selectStorageFileSystem(em, groupID, defaultURI);
-            return fs;
-        } catch (Exception e) {
-            throw e;
-        }
+    public void setRequestService(RequestService requestService) {
+        this.requestService = requestService;
     }
 
-    private FileSystem selectStorageFileSystem(EntityManager em,
-            String groupID, String defaultURI) throws DicomServiceException {
+    @Override
+    public FileSystem selectStorageFileSystem(String groupID, String defaultURI)
+        throws DicomServiceException {
         TypedQuery<FileSystem> selectCurFileSystem =
                 em.createNamedQuery(FileSystem.FIND_BY_GROUP_ID_AND_STATUS, FileSystem.class)
                 .setParameter(1, groupID)
@@ -168,19 +165,8 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public boolean store(StoreParam storeParam, String sourceAET,
-            Attributes attrs, FileRef fileRef, Attributes modified)
-                    throws Exception {
-        try {
-            boolean store = store(em, storeParam, sourceAET, attrs, fileRef, modified);
-            return store;
-        } catch (Exception e) {
-            throw e;
-        }
-     }
-
-    private boolean store(EntityManager em, StoreParam storeParam,
-            String sourceAET, Attributes data, FileRef fileRef,
-            Attributes modified) throws DicomServiceException {
+            Attributes data, FileRef fileRef, Attributes modified)
+                    throws DicomServiceException {
         try {
             Availability availability = fileRef.getFileSystem().getAvailability();
             Instance inst;
@@ -342,10 +328,10 @@ public class StoreServiceImpl implements StoreService {
             series.setStudy(study);
             series.setInstitutionCode(
                     singleCode(data, Tag.InstitutionCodeSequence));
-//            series.setScheduledProcedureSteps(
-//                    getScheduledProcedureSteps(
-//                            data.getSequence(Tag.RequestAttributesSequence),
-//                            data, study.getPatient(), storeParam));
+            series.setScheduledProcedureSteps(
+                    getScheduledProcedureSteps(
+                            data.getSequence(Tag.RequestAttributesSequence),
+                            data, study.getPatient(), storeParam));
             series.setSourceAET(sourceAET);
             series.setRetrieveAETs(storeParam.getRetrieveAETs());
             series.setExternalRetrieveAET(storeParam.getExternalRetrieveAET());
@@ -361,6 +347,31 @@ public class StoreServiceImpl implements StoreService {
         mergeStudyAttributes(storeParam, study, data, availability);
         mergePatientAttributes(storeParam, study.getPatient(), data);
         return series;
+    }
+
+    private Collection<ScheduledProcedureStep> getScheduledProcedureSteps(
+            Sequence requestAttrsSeq, Attributes data, Patient patient,
+            StoreParam storeParam) {
+        if (requestAttrsSeq == null)
+            return null;
+        ArrayList<ScheduledProcedureStep> list =
+                new ArrayList<ScheduledProcedureStep>(requestAttrsSeq.size());
+        for (Attributes requestAttrs : requestAttrsSeq) {
+            if (requestAttrs.containsValue(Tag.ScheduledProcedureStepID)
+                    && requestAttrs.containsValue(Tag.RequestedProcedureID)
+                    && (requestAttrs.containsValue(Tag.AccessionNumber)
+                            || data.contains(Tag.AccessionNumber))) {
+                Attributes attrs = new Attributes(data.bigEndian(),
+                        data.size() + requestAttrs.size());
+                attrs.addAll(data);
+                attrs.addAll(requestAttrs);
+                ScheduledProcedureStep sps =
+                        requestService.findOrCreateScheduledProcedureStep(
+                                attrs, patient, storeParam);
+                list.add(sps);
+            }
+        }
+        return list;
     }
 
     private void mergePatientAttributes(StoreParam storeParam,

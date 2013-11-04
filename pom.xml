@@ -157,6 +157,8 @@
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
     <module>dcm4chee-arc-rs-control</module>
+    <module>dcm4chee-arc-common</module>
+    <module>dcm4chee-arc-request</module>
   </modules>
   <build>
     <pluginManagement>

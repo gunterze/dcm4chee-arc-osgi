@@ -67,11 +67,11 @@ import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.util.AttributesFormat;
 import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.ArchiveService;
+import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.compress.CompressionService;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.FileRef;
 import org.dcm4chee.archive.entity.FileSystem;
-import org.dcm4chee.archive.store.StoreParam;
 import org.dcm4chee.archive.store.StoreService;
 
 /**

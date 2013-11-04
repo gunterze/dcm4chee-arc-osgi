@@ -17,6 +17,7 @@
         <property name="patientService" ref="patientService"/>
         <property name="issuerService" ref="issuerService"/>
         <property name="codeService" ref="codeService"/>
+        <property name="requestService" ref="requestService"/>
     </bean>
     
     <reference
@@ -30,5 +31,9 @@
     <reference
         id="codeService"
         interface="org.dcm4chee.archive.code.CodeService" />
+
+    <reference
+        id="requestService"
+        interface="org.dcm4chee.archive.request.RequestService" />
 
 </blueprint>

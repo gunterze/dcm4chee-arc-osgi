@@ -16,7 +16,7 @@
  *
  * The Initial Developer of the Original Code is
  * Agfa Healthcare.
- * Portions created by the Initial Developer are Copyright (C) 2011-2013
+ * Portions created by the Initial Developer are Copyright (C) 2011
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
@@ -36,25 +36,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.store;
-
-import org.dcm4che.data.Attributes;
-import org.dcm4che.net.service.DicomServiceException;
-import org.dcm4chee.archive.common.StoreParam;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
+package org.dcm4chee.archive.request;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
  */
-public interface StoreService {
+public class EntityAlreadyExistsException extends RuntimeException {
 
-    FileSystem selectStorageFileSystem(String groupID, String defaultURI)
-            throws DicomServiceException;
+    private static final long serialVersionUID = 8766498222010631052L;
 
-    boolean store(StoreParam storeParams, String sourceAET, Attributes attrs,
-            FileRef fileRef, Attributes modified) throws DicomServiceException;
+    public EntityAlreadyExistsException(String message) {
+        super(message);
+    }
 
-    
 }

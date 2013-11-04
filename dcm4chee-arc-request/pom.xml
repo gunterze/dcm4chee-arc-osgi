@@ -5,9 +5,9 @@
     <artifactId>dcm4chee-arc-parent</artifactId>
     <version>4.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>dcm4chee-arc-store</artifactId>
+  <artifactId>dcm4chee-arc-request</artifactId>
   <packaging>bundle</packaging>
-  <name>dcm4chee-arc-store</name>
+  <name>dcm4chee-arc-request</name>
   <build>
     <plugins>
       <plugin>
@@ -29,17 +29,7 @@
     </dependency>
     <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-patient</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-request</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-code</artifactId>
+      <artifactId>dcm4chee-arc-issuer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

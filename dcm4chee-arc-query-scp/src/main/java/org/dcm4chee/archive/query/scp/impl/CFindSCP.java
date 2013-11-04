@@ -125,7 +125,9 @@ public class CFindSCP extends BasicCFindSCP {
             if (pid != null && pid.getIssuer() == null)
                 pid.setIssuer(queryParam.getDefaultIssuerOfPatientID());
 //            IDWithIssuer[] pids = Archive.getInstance().pixQuery(ae, pid);
-            IDWithIssuer[] pids = pid != null ? new IDWithIssuer[]{ pid } : null;
+            IDWithIssuer[] pids = pid != null 
+                    ? new IDWithIssuer[]{ pid }
+                    : IDWithIssuer.EMPTY;
             Query query = queryService.createQuery(qrlevel, pids, keys, queryParam);
             try {
                 query.executeQuery();

@@ -52,6 +52,7 @@ import org.dcm4che.net.pdu.ExtendedNegotiation;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicCFindSCP;
 import org.dcm4che.net.service.DicomServiceException;
+import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4che.net.service.QueryRetrieveLevel;
 import org.dcm4che.net.service.QueryTask;
 import org.dcm4chee.archive.ArchiveService;
@@ -69,6 +70,8 @@ public class CFindSCP extends BasicCFindSCP {
 
     private ArchiveService archiveService;
     private QueryService queryService;
+    
+    private DicomServiceRegistry registry = null; 
 
     public CFindSCP(String sopClass, String... qrLevels) {
         super(sopClass);
@@ -93,11 +96,19 @@ public class CFindSCP extends BasicCFindSCP {
     }
 
     public void init() {
-        archiveService.getServiceRegistry().addDicomService(this);
+        getServiceRegistry().addDicomService(this);
     }
 
     public void destroy() {
-        archiveService.getServiceRegistry().removeDicomService(this);
+        getServiceRegistry().removeDicomService(this);
+    }
+    
+    private DicomServiceRegistry getServiceRegistry()
+    {
+        if (registry == null)
+            registry = getArchiveService().getServiceRegistry();
+        
+        return registry;
     }
 
     @Override

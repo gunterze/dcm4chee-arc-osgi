@@ -64,6 +64,7 @@ import org.dcm4che.net.Status;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicCStoreSCP;
 import org.dcm4che.net.service.DicomServiceException;
+import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4che.util.AttributesFormat;
 import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.ArchiveService;
@@ -83,7 +84,8 @@ public class CStoreSCP extends BasicCStoreSCP {
     private ArchiveService archiveService;
     private StoreService storeService;
     private CompressionService compressionService;
-
+    private DicomServiceRegistry registry = null; 
+    
     public CStoreSCP() {
         super("*");
     }
@@ -113,11 +115,19 @@ public class CStoreSCP extends BasicCStoreSCP {
     }
 
     public void init() {
-        archiveService.getServiceRegistry().addDicomService(this);
+        getServiceRegistry().addDicomService(this);
     }
 
     public void destroy() {
-        archiveService.getServiceRegistry().removeDicomService(this);
+        getServiceRegistry().removeDicomService(this);
+    }
+    
+    private DicomServiceRegistry getServiceRegistry()
+    {
+        if (registry == null)
+            registry = getArchiveService().getServiceRegistry();
+        
+        return registry;
     }
 
     @Override

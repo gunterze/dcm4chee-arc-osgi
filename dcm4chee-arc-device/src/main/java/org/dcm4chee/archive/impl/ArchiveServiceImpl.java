@@ -40,9 +40,12 @@ package org.dcm4chee.archive.impl;
 
 import java.io.File;
 
+import org.dcm4che.conf.api.ApplicationEntityCache;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.imageio.codec.ImageReaderFactory;
 import org.dcm4che.imageio.codec.ImageWriterFactory;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Device;
 import org.dcm4che.net.DeviceService;
 import org.dcm4che.net.hl7.HL7DeviceExtension;
@@ -52,6 +55,7 @@ import org.dcm4che.net.imageio.ImageWriterExtension;
 import org.dcm4che.net.service.BasicCEchoSCP;
 import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
+import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -75,16 +79,10 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     private final DicomServiceRegistry serviceRegistry = new DicomServiceRegistry();
     private final HL7ServiceRegistry hl7ServiceRegistry = new HL7ServiceRegistry();
 
+    private ApplicationEntityCache aeCache;
+
     public ArchiveServiceImpl() {
         serviceRegistry.addDicomService(new BasicCEchoSCP());
-    }
-
-    private static void addJBossDirURLSystemProperties() {
-        for (String key : JBOSS_PROPERITIES) {
-            String url = new File(System.getProperty(key + ".dir"))
-                .toURI().toString();
-            System.setProperty(key + ".url", url.substring(0, url.length()-1));
-        }
     }
 
     @Override
@@ -107,6 +105,7 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
 
     public void setDicomConfiguration(DicomConfiguration dicomConfig) {
         this.dicomConfig = dicomConfig;
+        this.aeCache = new ApplicationEntityCache(dicomConfig);
     }
 
     public void init() throws Exception {
@@ -116,6 +115,7 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
         device.setDimseRQHandler(serviceRegistry);
         device.getDeviceExtension(HL7DeviceExtension.class)
             .setHL7MessageListener(hl7ServiceRegistry);
+        setConfigurationStaleTimeout();
         initImageReaderFactory();
         initImageWriterFactory();
         start();
@@ -143,11 +143,25 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     }
 
     @Override
+    public ApplicationEntity findApplicationEntity(String aet)
+            throws ConfigurationException {
+        return aeCache.findApplicationEntity(aet);
+    }
+
+    @Override
     public void reload() throws Exception {
         device.reconfigure(dicomConfig.findDevice(device.getDeviceName()));
+        setConfigurationStaleTimeout();
         initImageReaderFactory();
         initImageWriterFactory();
         device.rebindConnections();
     }
 
+    private void setConfigurationStaleTimeout() {
+        ArchiveDeviceExtension ext = device.getDeviceExtension(ArchiveDeviceExtension.class);
+        int staleTimeout = ext.getConfigurationStaleTimeout();
+        aeCache.setStaleTimeout(staleTimeout);
+//        hl7AppCache.setStaleTimeout(staleTimeout);
+//        WadoAttributesCache.INSTANCE.setStaleTimeout(ext.getWadoAttributesStaleTimeout());
+    }
 }

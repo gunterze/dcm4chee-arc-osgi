@@ -38,6 +38,8 @@
 
 package org.dcm4chee.archive;
 
+import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Device;
 import org.dcm4che.net.hl7.service.HL7ServiceRegistry;
 import org.dcm4che.net.service.DicomServiceRegistry;
@@ -61,5 +63,8 @@ public interface ArchiveService {
     DicomServiceRegistry getServiceRegistry();
 
     HL7ServiceRegistry getHL7ServiceRegistry();
+
+    ApplicationEntity findApplicationEntity(String aet)
+            throws ConfigurationException;
 
 }

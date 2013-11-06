@@ -50,7 +50,6 @@
     <property name="archiveService" ref="archiveService" />
     <property name="retrieveService" ref="retrieveService" />
     <property name="queryPatientNamesService" ref="queryPatientNamesService" />
-    <property name="dicomConfiguration" ref="dicomConfiguration" />
   </bean>
 
   <bean id="studyRootCMoveSCP"
@@ -61,7 +60,6 @@
     <property name="archiveService" ref="archiveService" />
     <property name="retrieveService" ref="retrieveService" />
     <property name="queryPatientNamesService" ref="queryPatientNamesService" />
-    <property name="dicomConfiguration" ref="dicomConfiguration" />
   </bean>
 
   <bean id="patientStudyOnlyCMoveSCP"
@@ -72,7 +70,6 @@
     <property name="archiveService" ref="archiveService" />
     <property name="retrieveService" ref="retrieveService" />
     <property name="queryPatientNamesService" ref="queryPatientNamesService" />
-    <property name="dicomConfiguration" ref="dicomConfiguration" />
   </bean>
 
   <reference id="archiveService"
@@ -83,8 +80,5 @@
 
   <reference id="queryPatientNamesService"
     interface="org.dcm4chee.archive.query.common.QueryPatientNamesService" />
-
-  <reference id="dicomConfiguration"
-    interface="org.dcm4che.conf.api.DicomConfiguration" />
 
 </blueprint>

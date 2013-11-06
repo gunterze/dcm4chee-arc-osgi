@@ -43,6 +43,7 @@ import static org.dcm4che.net.service.BasicRetrieveTask.Service.C_GET;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.data.Tag;
@@ -128,12 +129,12 @@ public class CGetSCP extends BasicCGetSCP {
             QueryParam queryParam = QueryParam.valueOf(ae, queryOpts,
                     accessControlIDs());
             ApplicationEntity sourceAE = null;
-//            try {
-//                sourceAE = Archive.getInstance()
-//                        .findApplicationEntity(as.getRemoteAET());
-//                queryParam.setDefaultIssuer(sourceAE.getDevice());
-//            } catch (ConfigurationException e) {
-//            }
+            try {
+                sourceAE = archiveService
+                        .findApplicationEntity(as.getRemoteAET());
+                queryParam.setDefaultIssuer(sourceAE.getDevice());
+            } catch (ConfigurationException e) {
+            }
             IDWithIssuer pid = IDWithIssuer.fromPatientIDWithIssuer(keys);
             if (pid != null && pid.getIssuer() == null)
                 pid.setIssuer(queryParam.getDefaultIssuerOfPatientID());

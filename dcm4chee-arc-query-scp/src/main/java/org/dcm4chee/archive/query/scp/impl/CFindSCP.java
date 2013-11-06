@@ -41,6 +41,7 @@ package org.dcm4chee.archive.query.scp.impl;
 
 import java.util.EnumSet;
 
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.data.Tag;
@@ -119,13 +120,13 @@ public class CFindSCP extends BasicCFindSCP {
         try {
             QueryParam queryParam = QueryParam.valueOf(ae, queryOpts,
                     accessControlID(as));
-//            try {
-//                queryParam.setDefaultIssuer(
-//                        Archive.getInstance()
-//                                .findApplicationEntity(as.getRemoteAET())
-//                        .getDevice());
-//            } catch (ConfigurationException e) {
-//            }
+            try {
+                queryParam.setDefaultIssuer(
+                        archiveService
+                                .findApplicationEntity(as.getRemoteAET())
+                        .getDevice());
+            } catch (ConfigurationException e) {
+            }
             IDWithIssuer pid = IDWithIssuer.fromPatientIDWithIssuer(keys);
             if (pid != null && pid.getIssuer() == null)
                 pid.setIssuer(queryParam.getDefaultIssuerOfPatientID());

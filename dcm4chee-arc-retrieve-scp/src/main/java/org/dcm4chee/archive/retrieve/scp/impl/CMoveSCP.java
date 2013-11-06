@@ -45,6 +45,7 @@ import java.security.GeneralSecurityException;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.ConfigurationNotFoundException;
 import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.data.Attributes;
@@ -80,7 +81,6 @@ public class CMoveSCP extends BasicCMoveSCP {
     private ArchiveService archiveService;
     private RetrieveService retrieveService;
     private QueryPatientNamesService queryPatientNamesService;
-    private DicomConfiguration dicomConfig;
 
     private DicomServiceRegistry registry = null; 
 
@@ -100,10 +100,6 @@ public class CMoveSCP extends BasicCMoveSCP {
 
     public void setQueryPatientNamesService(QueryPatientNamesService queryPatientNamesService) {
         this.queryPatientNamesService = queryPatientNamesService;
-    }
-
-    public void setDicomConfiguration(DicomConfiguration dicomConfig) {
-        this.dicomConfig = dicomConfig;
     }
 
     public void init() {
@@ -130,16 +126,16 @@ public class CMoveSCP extends BasicCMoveSCP {
         String dest = rq.getString(Tag.MoveDestination);
         try {
             final ApplicationEntity destAE =
-                    dicomConfig.findApplicationEntity(dest);
+                    archiveService.findApplicationEntity(dest);
             ApplicationEntity ae = as.getApplicationEntity();
             ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
             QueryParam queryParam = QueryParam.valueOf(ae, queryOpts, accessControlIDs());
-//            try {
-//                queryParam.setDefaultIssuer(
-//                        Archive.getInstance().findApplicationEntity(as.getRemoteAET())
-//                            .getDevice());
-//            } catch (ConfigurationException e) {
-//            }
+            try {
+                queryParam.setDefaultIssuer(
+                        archiveService.findApplicationEntity(as.getRemoteAET())
+                            .getDevice());
+            } catch (ConfigurationException e) {
+            }
             IDWithIssuer pid = IDWithIssuer.fromPatientIDWithIssuer(keys);
             if (pid != null && pid.getIssuer() == null)
                 pid.setIssuer(queryParam.getDefaultIssuerOfPatientID());

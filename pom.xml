@@ -144,6 +144,7 @@
   </dependencyManagement>
   <modules>
     <module>dcm4chee-arc-code</module>
+    <module>dcm4chee-arc-common</module>
     <module>dcm4chee-arc-compress</module>
     <module>dcm4chee-arc-conf</module>
     <module>dcm4chee-arc-conf-ldap</module>
@@ -153,12 +154,15 @@
     <module>dcm4chee-arc-issuer</module>
     <module>dcm4chee-arc-patient</module>
     <module>dcm4chee-arc-query</module>
+    <module>dcm4chee-arc-query-common</module>
     <module>dcm4chee-arc-query-scp</module>
+    <module>dcm4chee-arc-request</module>
+    <module>dcm4chee-arc-retrieve</module>
+    <module>dcm4chee-arc-retrieve-scp</module>
+    <module>dcm4chee-arc-rs-control</module>
+    <module>dcm4chee-arc-series</module>
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
-    <module>dcm4chee-arc-rs-control</module>
-    <module>dcm4chee-arc-common</module>
-    <module>dcm4chee-arc-request</module>
   </modules>
   <build>
     <pluginManagement>

@@ -35,24 +35,25 @@
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.dcm4chee.archive.query.impl;
+package org.dcm4chee.archive.series.impl;
 
 import javax.persistence.EntityManager;
 
 import org.dcm4che.data.Attributes;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.entity.Availability;
 import org.dcm4chee.archive.entity.Instance;
 import org.dcm4chee.archive.entity.PatientStudySeriesAttributes;
 import org.dcm4chee.archive.entity.QueryPatientStudySeriesAttributes;
 import org.dcm4chee.archive.entity.Series;
 import org.dcm4chee.archive.entity.Study;
-import org.dcm4chee.archive.query.QueryParam;
+import org.dcm4chee.archive.series.SeriesService;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public class SeriesService {
+public class SeriesServiceImpl implements SeriesService{
 
     private EntityManager em;
 
@@ -64,6 +65,7 @@ public class SeriesService {
         this.em = em;
     }
 
+    @Override
     public Attributes getAttributes(Long seriesPk) {
         PatientStudySeriesAttributes result = (PatientStudySeriesAttributes)
                 getEntityManager().createNamedQuery(Series.PATIENT_STUDY_SERIES_ATTRIBUTES)
@@ -72,6 +74,7 @@ public class SeriesService {
         return result.getAttributes();
     }
 
+    @Override
     public Attributes getAttributes(Long seriesPk, QueryParam queryParam) {
         QueryPatientStudySeriesAttributes result = (QueryPatientStudySeriesAttributes)
                 getEntityManager().createNamedQuery(Series.QUERY_PATIENT_STUDY_SERIES_ATTRIBUTES)
@@ -88,6 +91,7 @@ public class SeriesService {
         return attrs;
     }
 
+    @Override
     public int[] calculateNumberOfSeriesRelatedInstances(Long seriesPk) {
         int num = getEntityManager().createNamedQuery(Instance.NUMBER_OF_SERIES_RELATED_INSTANCES, Long.class)
                 .setParameter(1, seriesPk)
@@ -105,6 +109,7 @@ public class SeriesService {
         return new int[] { num, numA };
     }
 
+    @Override
     public int[] calculateNumberOfStudyRelatedInstances(Long studyPk) {
         int numSeries = getEntityManager().createNamedQuery(Series.NUMBER_OF_SERIES, Long.class)
                 .setParameter(1, studyPk)

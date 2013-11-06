@@ -4,8 +4,7 @@
   xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
   <!-- this is the service this bundle is exposing (the Device Service) -->
-  <service
-    id="archiveService"
+  <service id="archiveService"
     interface="org.dcm4chee.archive.ArchiveService"
     ref="archiveServiceImpl" />
 
@@ -21,22 +20,16 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean
+  <bean id="archiveServiceImpl"
     class="org.dcm4chee.archive.impl.ArchiveServiceImpl"
-    id="archiveServiceImpl"
     activation="eager"
     init-method="init"
     destroy-method="destroy">
-    <property
-      name="dicomConfiguration"
-      ref="dicomConfig" />
-    <property
-      name="deviceName"
-      value="${device-name}" />
+    <property name="dicomConfiguration" ref="dicomConfiguration" />
+    <property name="deviceName" value="${device-name}" />
   </bean>
 
-  <reference
-    id="dicomConfig"
+  <reference id="dicomConfiguration"
     interface="org.dcm4che.conf.api.DicomConfiguration" />
 
 </blueprint>

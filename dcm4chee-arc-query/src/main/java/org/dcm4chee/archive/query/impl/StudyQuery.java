@@ -44,6 +44,7 @@ import org.dcm4chee.archive.entity.Availability;
 import org.dcm4chee.archive.entity.query.types.QPatient;
 import org.dcm4chee.archive.entity.query.types.QStudy;
 import org.dcm4chee.archive.entity.Utils;
+import org.dcm4chee.archive.query.common.QueryBuilder;
 import org.hibernate.ScrollableResults;
 
 import com.mysema.query.BooleanBuilder;
@@ -82,8 +83,8 @@ class StudyQuery extends AbstractQuery {
     @Override
     protected HibernateQuery createQuery(IDWithIssuer[] pids, Attributes keys) {
         BooleanBuilder builder = new BooleanBuilder();
-        Builder.addPatientLevelPredicates(builder, pids, keys, queryParam);
-        Builder.addStudyLevelPredicates(builder, keys, queryParam);
+        QueryBuilder.addPatientLevelPredicates(builder, pids, keys, queryParam);
+        QueryBuilder.addStudyLevelPredicates(builder, keys, queryParam);
         return new HibernateQuery(session)
             .from(QStudy.study)
             .innerJoin(QStudy.study.patient, QPatient.patient)

@@ -56,9 +56,10 @@ import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4che.net.service.QueryRetrieveLevel;
 import org.dcm4che.net.service.QueryTask;
 import org.dcm4chee.archive.ArchiveService;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.query.Query;
-import org.dcm4chee.archive.query.QueryParam;
 import org.dcm4chee.archive.query.QueryService;
+import org.dcm4chee.archive.query.common.QueryPatientNamesService;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -70,7 +71,8 @@ public class CFindSCP extends BasicCFindSCP {
 
     private ArchiveService archiveService;
     private QueryService queryService;
-    
+    private QueryPatientNamesService queryPatientNamesService;
+
     private DicomServiceRegistry registry = null; 
 
     public CFindSCP(String sopClass, String... qrLevels) {
@@ -79,36 +81,28 @@ public class CFindSCP extends BasicCFindSCP {
         this.rootLevel = QueryRetrieveLevel.valueOf(qrLevels[0]);
     }
 
-    public ArchiveService getArchiveService() {
-        return archiveService;
-    }
-
     public void setArchiveService(ArchiveService archiveService) {
         this.archiveService = archiveService;
-    }
-
-    public QueryService getQueryService() {
-        return queryService;
     }
 
     public void setQueryService(QueryService queryService) {
         this.queryService = queryService;
     }
 
+    public void setQueryPatientNamesService(QueryPatientNamesService queryPatientNamesService) {
+        this.queryPatientNamesService = queryPatientNamesService;
+    }
+
     public void init() {
-        getServiceRegistry().addDicomService(this);
+        registry = archiveService.getServiceRegistry();
+        registry.addDicomService(this);
     }
 
     public void destroy() {
-        getServiceRegistry().removeDicomService(this);
-    }
-    
-    private DicomServiceRegistry getServiceRegistry()
-    {
-        if (registry == null)
-            registry = getArchiveService().getServiceRegistry();
-        
-        return registry;
+        if (registry != null) {
+            registry.removeDicomService(this);
+            registry = null;
+        }
     }
 
     @Override
@@ -147,7 +141,8 @@ public class CFindSCP extends BasicCFindSCP {
                 throw e;
             }
             return new QueryTaskImpl(as, pc, rq, keys, pids, queryParam,
-                    rootLevel == QueryRetrieveLevel.PATIENT, query);
+                    rootLevel == QueryRetrieveLevel.PATIENT, query,
+                    queryPatientNamesService);
         } catch (DicomServiceException e) {
             throw e;
         } catch (Exception e) {

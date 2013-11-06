@@ -42,6 +42,7 @@ import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4chee.archive.entity.query.types.QPatient;
 import org.dcm4chee.archive.entity.Utils;
+import org.dcm4chee.archive.query.common.QueryBuilder;
 import org.hibernate.ScrollableResults;
 
 import com.mysema.query.BooleanBuilder;
@@ -70,7 +71,7 @@ class PatientQuery extends AbstractQuery {
     @Override
     protected HibernateQuery createQuery(IDWithIssuer[] pids, Attributes keys) {
         BooleanBuilder builder = new BooleanBuilder();
-        Builder.addPatientLevelPredicates(builder, pids, keys, queryParam);
+        QueryBuilder.addPatientLevelPredicates(builder, pids, keys, queryParam);
         return new HibernateQuery(session)
             .from(QPatient.patient)
             .where(builder);

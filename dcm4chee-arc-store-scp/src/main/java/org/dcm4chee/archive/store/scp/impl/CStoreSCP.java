@@ -115,19 +115,15 @@ public class CStoreSCP extends BasicCStoreSCP {
     }
 
     public void init() {
-        getServiceRegistry().addDicomService(this);
+        registry = archiveService.getServiceRegistry();
+        registry.addDicomService(this);
     }
 
     public void destroy() {
-        getServiceRegistry().removeDicomService(this);
-    }
-    
-    private DicomServiceRegistry getServiceRegistry()
-    {
-        if (registry == null)
-            registry = getArchiveService().getServiceRegistry();
-        
-        return registry;
+        if (registry != null) {
+            registry.removeDicomService(this);
+            registry = null;
+        }
     }
 
     @Override
@@ -151,8 +147,8 @@ public class CStoreSCP extends BasicCStoreSCP {
             MessageDigest digest = messageDigestOf(aeExt);
             storeTo(as, fmi, data, spoolFile, digest);
             Attributes attrs = parse(spoolFile);
-            String filePathStr = createFilePath(aeExt, attrs);
-            Path filePath = fsPath.resolve(filePathStr);
+            Path filePath = fsPath.resolve(
+                    createFilePath(aeExt, attrs).replace('/', File.separatorChar));
             Files.createDirectories(filePath.getParent());
             CompressionRule compressionRule =
                     findCompressionRules(aeExt, sourceAET, attrs);
@@ -176,7 +172,8 @@ public class CStoreSCP extends BasicCStoreSCP {
             File file = tmpPath.toFile();
             FileRef fileRef = new FileRef(
                     fs,
-                    filePathStr,
+                    fsPath.relativize(tmpPath).toString()
+                        .replace(File.separatorChar, '/'),
                     fmi.getString(Tag.TransferSyntaxUID),
                     file.length(), 
                     digest(digest));

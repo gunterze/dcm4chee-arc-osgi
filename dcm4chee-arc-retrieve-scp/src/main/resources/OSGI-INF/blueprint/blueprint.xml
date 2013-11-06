@@ -1,0 +1,90 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <bean id="patientRootCGetSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.PatientRootCGetSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+  </bean>
+
+  <bean id="studyRootCGetSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.StudyRootCGetSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+  </bean>
+
+  <bean id="patientStudyOnlyCGetSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.PatientStudyOnlyCGetSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+  </bean>
+
+  <bean id="withoutBulkDataCGetSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.WithoutBulkDataCGetSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+  </bean>
+
+  <bean id="patientRootCMoveSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.PatientRootCMoveSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+    <property name="dicomConfiguration" ref="dicomConfiguration" />
+  </bean>
+
+  <bean id="studyRootCMoveSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.StudyRootCMoveSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+    <property name="dicomConfiguration" ref="dicomConfiguration" />
+  </bean>
+
+  <bean id="patientStudyOnlyCMoveSCP"
+    class="org.dcm4chee.archive.retrieve.scp.impl.PatientStudyOnlyCMoveSCP"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="retrieveService" ref="retrieveService" />
+    <property name="queryPatientNamesService" ref="queryPatientNamesService" />
+    <property name="dicomConfiguration" ref="dicomConfiguration" />
+  </bean>
+
+  <reference id="archiveService"
+    interface="org.dcm4chee.archive.ArchiveService" />
+
+  <reference id="retrieveService"
+    interface="org.dcm4chee.archive.retrieve.RetrieveService" />
+
+  <reference id="queryPatientNamesService"
+    interface="org.dcm4chee.archive.query.common.QueryPatientNamesService" />
+
+  <reference id="dicomConfiguration"
+    interface="org.dcm4che.conf.api.DicomConfiguration" />
+
+</blueprint>

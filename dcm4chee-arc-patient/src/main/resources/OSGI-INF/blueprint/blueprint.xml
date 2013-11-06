@@ -4,21 +4,18 @@
     xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" 
     xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
 
-    <service
-        id="patientService"
+    <service id="patientService"
         interface="org.dcm4chee.archive.patient.PatientService"
         ref="patientServiceImpl" />
 
-    <bean
-        class="org.dcm4chee.archive.patient.impl.PatientServiceImpl"
-        id="patientServiceImpl">
+    <bean id="patientServiceImpl"
+        class="org.dcm4chee.archive.patient.impl.PatientServiceImpl">
         <jpa:context unitname="dcm4chee-arc" property="entityManager" />
         <tx:transaction method="*" value="Required" />
         <property name="issuerService" ref="issuerService"/>
     </bean>
 
-    <reference
-        id="issuerService"
+    <reference id="issuerService"
         interface="org.dcm4chee.archive.issuer.IssuerService" />
 
 </blueprint>

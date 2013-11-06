@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.query;
+package org.dcm4chee.archive.common;
 
 import java.util.EnumSet;
 

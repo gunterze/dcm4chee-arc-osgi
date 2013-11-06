@@ -12,28 +12,13 @@
     <bean
         class="org.dcm4chee.archive.query.impl.QueryServiceImpl"
         id="queryServiceImpl">
-        <property name="bcontext" ref="blueprintBundleContext"/>        
-        <property name="dataSource" ref="dataSource" />
-        <property name="sessionFactory" ref="sessionFactory" />
+        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
         <property name="seriesService" ref="seriesService" />
-        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
-        <tx:transaction method="*" value="Required" />
-    </bean>
-
-    <bean
-        class="org.dcm4chee.archive.query.impl.SeriesService"
-        id="seriesService">
-        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
         <tx:transaction method="*" value="Required" />
     </bean>
 
    <reference
-        id="dataSource"
-        interface="javax.sql.DataSource"
-        filter="osgi.jndi.service.name=PacsDS" />
-
-   <reference
-        id="sessionFactory"
-        interface="org.hibernate.SessionFactory" />
+        id="seriesService"
+        interface="org.dcm4chee.archive.series.SeriesService" />
 
 </blueprint>

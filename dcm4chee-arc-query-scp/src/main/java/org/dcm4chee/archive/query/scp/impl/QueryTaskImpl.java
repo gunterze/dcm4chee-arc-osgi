@@ -52,8 +52,9 @@ import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicQueryTask;
 import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.util.StringUtils;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.query.Query;
-import org.dcm4chee.archive.query.QueryParam;
+import org.dcm4chee.archive.query.common.QueryPatientNamesService;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -72,7 +73,8 @@ class QueryTaskImpl extends BasicQueryTask {
 
     public QueryTaskImpl(Association as, PresentationContext pc, Attributes rq,
             Attributes keys, IDWithIssuer[] pids, QueryParam queryParam,
-            boolean skipMatchesWithoutPatientID, Query query)
+            boolean skipMatchesWithoutPatientID, Query query, 
+            QueryPatientNamesService queryPatientNamesService)
             throws Exception {
         super(as, pc, rq, keys);
         this.query = query;
@@ -89,7 +91,7 @@ class QueryTaskImpl extends BasicQueryTask {
         this.returnOtherPatientNames = queryParam.isReturnOtherPatientNames()
                 && keys.contains(Tag.OtherPatientNames);
         this.patientNames = returnOtherPatientNames && pids.length > 1 
-                ? query.patientNamesOf(pids)
+                ? queryPatientNamesService.patientNamesOf(pids)
                 : null;
         this.skipMatchesWithoutPatientID = skipMatchesWithoutPatientID;
      }

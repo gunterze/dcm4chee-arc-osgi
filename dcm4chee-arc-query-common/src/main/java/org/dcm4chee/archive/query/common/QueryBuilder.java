@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.query.impl;
+package org.dcm4chee.archive.query.common;
 
 import java.util.List;
 
@@ -46,7 +46,9 @@ import org.dcm4che.data.Issuer;
 import org.dcm4che.data.Sequence;
 import org.dcm4che.data.Tag;
 import org.dcm4che.net.service.QueryRetrieveLevel;
+import org.dcm4che.util.StringUtils;
 import org.dcm4che.util.TagUtils;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.conf.AttributeFilter;
 import org.dcm4chee.archive.conf.Entity;
 import org.dcm4chee.archive.entity.Availability;
@@ -63,7 +65,6 @@ import org.dcm4chee.archive.entity.query.types.QSeries;
 import org.dcm4chee.archive.entity.query.types.QServiceRequest;
 import org.dcm4chee.archive.entity.query.types.QStudy;
 import org.dcm4chee.archive.entity.query.types.QVerifyingObserver;
-import org.dcm4chee.archive.query.QueryParam;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.jpa.hibernate.HibernateSubQuery;
@@ -79,7 +80,7 @@ import com.mysema.query.types.path.StringPath;
  * @author Gunter Zeilinger <gunterze@gmail.com>
  * @author Michael Backhaus <michael.backhaus@gmail.com>
  */
-public abstract class Builder {
+public abstract class QueryBuilder {
 
     public static StringPath stringPathOf(int tag, QueryRetrieveLevel qrLevel) {
         switch (qrLevel) {
@@ -366,7 +367,7 @@ public abstract class Builder {
             return null;
 
         Predicate predicate;
-        StringExpression expr = ignoreCase && isUpperCase(value) ? path.toUpperCase() : path;
+        StringExpression expr = ignoreCase && StringUtils.isUpperCase(value) ? path.toUpperCase() : path;
         if (containsWildcard(value)) {
             String pattern = toLikePattern(value);
             if (pattern.equals("%"))
@@ -377,10 +378,6 @@ public abstract class Builder {
             predicate = expr.eq(value);
 
         return matchUnknown(predicate, path, matchUnknown);
-    }
-
-    static boolean isUpperCase(String s) {
-        return s.equals(s.toUpperCase());
     }
 
     static boolean containsWildcard(String s) {
@@ -550,9 +547,9 @@ public abstract class Builder {
 
         boolean matchUnknown = queryParam.isMatchUnknown();
         BooleanBuilder builder = new BooleanBuilder();
-        Builder.addServiceRequestPredicates(builder, item, queryParam);
-        Builder.addRequestedProcedurePredicates(builder, item, queryParam);
-        Builder.addScheduledProcedureStepPredicates(builder, item, queryParam);
+        QueryBuilder.addServiceRequestPredicates(builder, item, queryParam);
+        QueryBuilder.addRequestedProcedurePredicates(builder, item, queryParam);
+        QueryBuilder.addScheduledProcedureStepPredicates(builder, item, queryParam);
         if (!builder.hasValue())
             return null;
 

@@ -38,25 +38,17 @@
 
 package org.dcm4chee.archive.query.impl;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
-import org.dcm4che.data.Tag;
-import org.dcm4chee.archive.entity.Utils;
-import org.dcm4chee.archive.entity.query.types.QPatient;
-import org.dcm4chee.archive.query.QueryParam;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.query.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.StatelessSession;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.Tuple;
 import com.mysema.query.jpa.hibernate.HibernateQuery;
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.OrderSpecifier;
@@ -69,8 +61,6 @@ public abstract class AbstractQuery implements Query {
     protected final QueryServiceImpl service;
 
     protected StatelessSession session;
-
-    protected Connection connection;
 
     protected ScrollableResults results;
 
@@ -89,8 +79,8 @@ public abstract class AbstractQuery implements Query {
     Query init(IDWithIssuer[] pids, Attributes keys, QueryParam queryParam)
             throws SQLException {
         this.queryParam = queryParam;
-        connection = service.getConnection();
-        session = service.openStatelessSession(connection);
+//        connection = service.getConnection();
+        session = service.openStatelessSession();
         query = createQuery(pids, keys);
         return this;
     }
@@ -156,41 +146,13 @@ public abstract class AbstractQuery implements Query {
     }
 
     @Override
-    public String[] patientNamesOf(IDWithIssuer[] pids) {
-        HashSet<String> c = new HashSet<String>(pids.length * 4 / 3 + 1);
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(Builder.pids(pids, false));
-        builder.and(QPatient.patient.mergedWith.isNull());
-        List<Tuple> tuples = new HibernateQuery(session)
-            .from(QPatient.patient)
-            .where(builder)
-            .list(
-                QPatient.patient.pk,
-                QPatient.patient.encodedAttributes);
-        for (Tuple tuple : tuples)
-            c.add(Utils.decodeAttributes(tuple.get(1, byte[].class))
-                    .getString(Tag.PatientName));
-        c.remove(null);
-        return c.toArray(new String[c.size()]);
-    }
-
-    @Override
     public void close() {
         StatelessSession s = session;
-        Connection c = connection;
-        connection = null;
         session = null;
         query = null;
         results = null;
         if (s != null)
             s.close();
-        if (c != null)
-            try {
-                c.close();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
     }
 
 }

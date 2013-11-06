@@ -2,33 +2,23 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean
+    <bean id="cstorescp"
         class="org.dcm4chee.archive.store.scp.impl.CStoreSCP"
-        id="cstorescp"
         activation="eager"
         init-method="init"
         destroy-method="destroy">
-        <property
-            name="archiveService"
-            ref="archiveService" />
-        <property
-            name="storeService"
-            ref="storeService" />
-        <property
-            name="compressionService"
-            ref="compressionService" />
+        <property name="archiveService" ref="archiveService" />
+        <property name="storeService" ref="storeService" />
+        <property name="compressionService" ref="compressionService" />
     </bean>
 
-    <reference
-        id="archiveService"
+    <reference id="archiveService"
         interface="org.dcm4chee.archive.ArchiveService" />
 
-    <reference
-        id="storeService"
+    <reference id="storeService"
         interface="org.dcm4chee.archive.store.StoreService" />
 
-    <reference
-        id="compressionService"
+    <reference id="compressionService"
         interface="org.dcm4chee.archive.compress.CompressionService" />
 
 </blueprint>

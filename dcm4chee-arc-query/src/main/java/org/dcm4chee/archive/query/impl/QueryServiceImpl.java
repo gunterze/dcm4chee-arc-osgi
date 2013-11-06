@@ -38,66 +38,30 @@
 
 package org.dcm4chee.archive.query.impl;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.net.service.QueryRetrieveLevel;
+import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.query.Query;
-import org.dcm4chee.archive.query.QueryParam;
 import org.dcm4chee.archive.query.QueryService;
+import org.dcm4chee.archive.series.SeriesService;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  */
 public class QueryServiceImpl implements QueryService {
 
-    private DataSource dataSource;
-
     private SessionFactory sessionFactory;
 
     private SeriesService seriesService;
-    
-    public BundleContext bcontext;
-    
-    public void setBcontext(BundleContext bcontext) {
-            this.bcontext = bcontext;
-    }
-    
-    private EntityManager em;
-
-    public EntityManager getEntityManager() {
-        return em;
-    }
 
     public void setEntityManager(EntityManager em) {
-        this.em = em;
-    }    
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+        sessionFactory = em.unwrap(Session.class).getSessionFactory();
     }
 
     public SeriesService getSeriesService() {
@@ -108,23 +72,8 @@ public class QueryServiceImpl implements QueryService {
         this.seriesService = seriesService;
     }
 
-    Connection getConnection() throws SQLException {
-        if (dataSource == null)
-            throw new IllegalStateException("dataSource not initialized");
-
-        return dataSource.getConnection();
-    }
-
-    StatelessSession openStatelessSession(Connection connection) 
-    {
-//        ServiceReference<SessionFactory> factoryRef = bcontext.getServiceReference(SessionFactory.class);
-//        SessionFactory factory = bcontext.getService(factoryRef);
-//        
-//        return factory.openStatelessSession(connection);
-        
-        Session s = em.unwrap(Session.class);
-        return s.getSessionFactory().openStatelessSession(connection);
-
+    StatelessSession openStatelessSession() {
+        return sessionFactory.openStatelessSession();
     }
 
     @Override

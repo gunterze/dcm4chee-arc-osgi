@@ -36,12 +36,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.query.impl;
+package org.dcm4chee.archive.query.common;
 
 import org.dcm4che.data.PersonName;
-import org.dcm4che.data.PersonName.Group;
 import org.dcm4che.soundex.FuzzyStr;
-import org.dcm4chee.archive.query.QueryParam;
+import org.dcm4chee.archive.common.QueryParam;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.ExpressionUtils;
@@ -79,9 +78,9 @@ class MatchPersonName {
         if (!pn.contains(PersonName.Group.Ideographic)
                 && !pn.contains(PersonName.Group.Phonetic)) {
             String queryString = toQueryString(pn, PersonName.Group.Alphabetic);
-            builder.or(Builder.wildCard(alphabethicName, queryString, false, true));
-            builder.or(Builder.wildCard(ideographicName, queryString, false, false));
-            builder.or(Builder.wildCard(phoneticName, queryString, false, false));
+            builder.or(QueryBuilder.wildCard(alphabethicName, queryString, false, true));
+            builder.or(QueryBuilder.wildCard(ideographicName, queryString, false, false));
+            builder.or(QueryBuilder.wildCard(phoneticName, queryString, false, false));
             if (matchUnknown) {
                 Predicate emptyName = ExpressionUtils.and(alphabethicName.eq("*"),
                                       ExpressionUtils.and(ideographicName.eq("*"),
@@ -97,9 +96,9 @@ class MatchPersonName {
     }
 
     private static Predicate wildCard(StringPath path,
-            PersonName pn, Group group, boolean matchUnknown, boolean ignoreCase) {
+            PersonName pn, PersonName.Group group, boolean matchUnknown, boolean ignoreCase) {
         return pn.contains(group)
-            ? Builder.wildCard(path, toQueryString(pn, group), matchUnknown, ignoreCase)
+            ? QueryBuilder.wildCard(path, toQueryString(pn, group), matchUnknown, ignoreCase)
             : null;
     }
 

@@ -67,7 +67,5 @@ public interface Query {
 
     Attributes nextMatch();
 
-    String[] patientNamesOf(IDWithIssuer[] pids);
-
     void close() throws SQLException;
 }

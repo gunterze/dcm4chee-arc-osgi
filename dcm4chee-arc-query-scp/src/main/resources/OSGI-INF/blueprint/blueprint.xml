@@ -2,54 +2,41 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean
+    <bean id="patientRootCFindSCP"
         class="org.dcm4chee.archive.query.scp.impl.PatientRootCFindSCP"
-        id="patientRootFindSCP"
         activation="eager"
         init-method="init"
         destroy-method="destroy">
-        <property
-            name="archiveService"
-            ref="archiveService" />
-        <property
-            name="queryService"
-            ref="queryService" />
+        <property name="archiveService" ref="archiveService" />
+        <property name="queryService" ref="queryService" />
     </bean>
 
-    <bean
+    <bean id="studyRootCFindSCP"
         class="org.dcm4chee.archive.query.scp.impl.StudyRootCFindSCP"
-        id="studyRootFindSCP"
         activation="eager"
         init-method="init"
         destroy-method="destroy">
-        <property
-            name="archiveService"
-            ref="archiveService" />
-        <property
-            name="queryService"
-            ref="queryService" />
+        <property name="archiveService" ref="archiveService" />
+        <property name="queryService" ref="queryService" />
     </bean>
 
-    <bean
+    <bean id="patientStudyOnlyCFindSCP"
         class="org.dcm4chee.archive.query.scp.impl.PatientStudyOnlyCFindSCP"
-        id="patientStudyOnlyFindSCP"
         activation="eager"
         init-method="init"
         destroy-method="destroy">
-        <property
-            name="archiveService"
-            ref="archiveService" />
-        <property
-            name="queryService"
-            ref="queryService" />
+        <property name="archiveService" ref="archiveService" />
+        <property name="queryService" ref="queryService" />
+        <property name="queryPatientNamesService" ref="queryPatientNamesService" />
     </bean>
 
-    <reference
-        id="archiveService"
+    <reference id="archiveService"
         interface="org.dcm4chee.archive.ArchiveService" />
 
-    <reference
-        id="queryService"
+    <reference id="queryService"
         interface="org.dcm4chee.archive.query.QueryService" />
+
+    <reference id="queryPatientNamesService"
+        interface="org.dcm4chee.archive.query.common.QueryPatientNamesService" />
 
 </blueprint>

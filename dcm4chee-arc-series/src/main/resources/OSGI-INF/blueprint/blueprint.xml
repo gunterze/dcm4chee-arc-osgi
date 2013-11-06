@@ -1,0 +1,17 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+    
+    <service id="seriesService"
+        interface="org.dcm4chee.archive.series.SeriesService"
+        ref="seriesServiceImpl" />
+
+    <bean id="seriesServiceImpl"
+        class="org.dcm4chee.archive.series.impl.SeriesServiceImpl">
+        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
+        <tx:transaction method="*" value="Required" />
+    </bean>
+
+</blueprint>

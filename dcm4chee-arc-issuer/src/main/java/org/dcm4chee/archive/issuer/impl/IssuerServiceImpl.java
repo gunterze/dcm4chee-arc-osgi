@@ -39,10 +39,8 @@
 package org.dcm4chee.archive.issuer.impl;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import javax.transaction.UserTransaction;
 
 import org.dcm4chee.archive.entity.Issuer;
 import org.dcm4chee.archive.issuer.IssuerService;

@@ -1,0 +1,25 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0" 
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+
+    <service id="mppsService"
+        interface="org.dcm4chee.archive.mpps.MPPSService"
+        ref="mppsServiceImpl" />
+
+    <bean id="mppsServiceImpl"
+        class="org.dcm4chee.archive.mpps.impl.MPPSServiceImpl">
+        <jpa:context unitname="dcm4chee-arc" property="entityManager" />
+        <property name="patientService" ref="patientService"/>
+        <property name="requestService" ref="requestService"/>
+        <tx:transaction method="*" value="Required" />
+    </bean>
+
+    <reference id="patientService"
+        interface="org.dcm4chee.archive.patient.PatientService" />
+
+    <reference id="requestService"
+        interface="org.dcm4chee.archive.request.RequestService" />
+
+</blueprint>

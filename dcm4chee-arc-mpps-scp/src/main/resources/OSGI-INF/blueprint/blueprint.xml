@@ -1,0 +1,20 @@
+<blueprint
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <bean id="mppsscp"
+        class="org.dcm4chee.archive.mpps.scp.impl.MPPSSCP"
+        activation="eager"
+        init-method="init"
+        destroy-method="destroy">
+        <property name="archiveService" ref="archiveService" />
+        <property name="mppsService" ref="mppsService" />
+    </bean>
+
+    <reference id="archiveService"
+        interface="org.dcm4chee.archive.ArchiveService" />
+
+    <reference id="mppsService"
+        interface="org.dcm4chee.archive.mpps.MPPSService" />
+
+</blueprint>

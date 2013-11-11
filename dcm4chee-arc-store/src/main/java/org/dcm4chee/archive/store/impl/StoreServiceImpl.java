@@ -212,7 +212,6 @@ public class StoreServiceImpl implements StoreService {
             fileRef.setInstance(inst);
             em.persist(fileRef);
             em.flush();
-            em.detach(fileRef);
             return true;
         } catch (DicomServiceException e) {
             throw e;

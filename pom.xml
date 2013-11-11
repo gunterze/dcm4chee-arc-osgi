@@ -9,7 +9,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <dcm4che.version>3.3.0-SNAPSHOT</dcm4che.version>
     <slf4j.version>1.6.1</slf4j.version>
-    <hibernate.version>4.2.6.Final</hibernate.version>
+    <hibernate.version>4.2.7.Final</hibernate.version>
     <querydsl.version>3.2.3</querydsl.version>
     <!--db>wildfly-mysql</db-->
     <!--ds>java:/PacsDS</ds-->
@@ -152,6 +152,8 @@
     <module>dcm4chee-arc-device</module>
     <module>dcm4chee-arc-entity</module>
     <module>dcm4chee-arc-issuer</module>
+    <module>dcm4chee-arc-mpps</module>
+    <module>dcm4chee-arc-mpps-scp</module>
     <module>dcm4chee-arc-patient</module>
     <module>dcm4chee-arc-query</module>
     <module>dcm4chee-arc-query-common</module>

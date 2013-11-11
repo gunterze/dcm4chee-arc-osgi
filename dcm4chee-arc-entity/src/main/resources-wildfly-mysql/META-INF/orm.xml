@@ -90,4 +90,49 @@
     </attributes>
   </entity>
 
+  <entity class="Visit">
+    <table name="visit" />
+    <attributes>
+      <basic name="encodedAttributes">
+        <column name="visit_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="ServiceRequest">
+    <table name="request" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="request_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="RequestedProcedure">
+    <table name="req_proc" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="req_proc_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="ScheduledProcedureStep">
+    <table name="sps" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="sps_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
+  <entity class="PerformedProcedureStep">
+    <table name="pps" />
+    <attributes>
+      <basic name="encodedAttributes" optional="false">
+        <column name="pps_attrs" column-definition="longblob" />
+      </basic>
+    </attributes>
+  </entity>
+
 </entity-mappings>

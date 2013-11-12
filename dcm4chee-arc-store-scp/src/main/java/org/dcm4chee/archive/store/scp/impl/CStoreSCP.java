@@ -38,41 +38,16 @@
 
 package org.dcm4chee.archive.store.scp.impl;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.data.BulkData;
-import org.dcm4che.data.Tag;
-import org.dcm4che.data.UID;
-import org.dcm4che.imageio.codec.CompressionRule;
-import org.dcm4che.io.DicomInputStream;
-import org.dcm4che.io.DicomInputStream.IncludeBulkData;
-import org.dcm4che.io.DicomOutputStream;
-import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Association;
 import org.dcm4che.net.PDVInputStream;
-import org.dcm4che.net.Status;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicCStoreSCP;
-import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.net.service.DicomServiceRegistry;
-import org.dcm4che.util.AttributesFormat;
-import org.dcm4che.util.TagUtils;
 import org.dcm4chee.archive.ArchiveService;
-import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.compress.CompressionService;
-import org.dcm4chee.archive.conf.ArchiveAEExtension;
-import org.dcm4chee.archive.entity.FileRef;
-import org.dcm4chee.archive.entity.FileSystem;
 import org.dcm4chee.archive.store.StoreService;
 
 /**
@@ -131,190 +106,10 @@ public class CStoreSCP extends BasicCStoreSCP {
             Attributes rq, PDVInputStream data, Attributes rsp)
             throws IOException {
 
-        Path tmpPath = null;
-        try {
-            String sourceAET = as.getRemoteAET();
-            String cuid = rq.getString(Tag.AffectedSOPClassUID);
-            String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
-            String tsuid = pc.getTransferSyntax();
-            Attributes fmi = as.createFileMetaInformation(iuid, cuid, tsuid);
-
-            ArchiveAEExtension aeExt = archiveAEExtensionOf(as);
-            FileSystem fs = selectStorageFileSystem(as, aeExt);
-            Path fsPath = fs.getPath();
-            tmpPath = createSpoolPath(fsPath, aeExt, sourceAET, cuid);
-            File spoolFile = tmpPath.toFile();
-            MessageDigest digest = messageDigestOf(aeExt);
-            storeTo(as, fmi, data, spoolFile, digest);
-            Attributes attrs = parse(spoolFile);
-            Path filePath = fsPath.resolve(
-                    createFilePath(aeExt, attrs).replace('/', File.separatorChar));
-            Files.createDirectories(filePath.getParent());
-            CompressionRule compressionRule =
-                    findCompressionRules(aeExt, sourceAET, attrs);
-            if (compressionRule != null) {
-                try {
-                    filePath = createUniqueFile(filePath);
-                    MessageDigest digest2 = messageDigestOf(aeExt);
-                    compressionService.compress(compressionRule, spoolFile,
-                            filePath.toFile(), digest2,
-                            fmi, attrs);
-                    Files.delete(tmpPath);
-                    tmpPath = filePath;
-                    digest = digest2;
-                } catch (IOException e) {
-                    Files.delete(filePath);
-                    tmpPath = move(tmpPath, fsPath, filePath);
-                }
-            } else {
-                tmpPath = move(tmpPath, fsPath, filePath);
-            }
-            File file = tmpPath.toFile();
-            FileRef fileRef = new FileRef(
-                    fs,
-                    fsPath.relativize(tmpPath).toString()
-                        .replace(File.separatorChar, '/'),
-                    fmi.getString(Tag.TransferSyntaxUID),
-                    file.length(), 
-                    digest(digest));
-            Attributes modified = new Attributes();
-            if (storeService.store(StoreParam.valueOf(aeExt), 
-                    sourceAET, attrs, fileRef, modified)) {
-                tmpPath = null;
-            }
-        } catch (Exception e) {
-            if (e instanceof DicomServiceException) {
-                throw (DicomServiceException) e;
-            } else {
-                throw new DicomServiceException(Status.ProcessingFailure, e);
-            }
-        } finally {
-            if (tmpPath != null) {
-                try {
-                    Files.delete(tmpPath);
-                } catch (IOException e2) {
-                    // TODO
-                }
-            }
+        try (StoreInstance store = new StoreInstance(this, as, pc, rq)) {
+            store.spool(data);
+            store.process(rsp);
         }
     }
-
-    private static CompressionRule findCompressionRules(ArchiveAEExtension aeExt,
-            String sourceAET, Attributes attrs) {
-        if (!(attrs.getValue(Tag.PixelData) instanceof BulkData))
-            return null;
-
-        return aeExt.getCompressionRules().findCompressionRule(sourceAET, attrs);
-    }
-
-    private String digest(MessageDigest digest) {
-        return digest != null ? TagUtils.toHexString(digest.digest()) : null;
-    }
-
-    private String createFilePath(ArchiveAEExtension aeExt, Attributes attrs)
-            throws DicomServiceException {
-        AttributesFormat filePathFormat = aeExt.getStorageFilePathFormat();
-        if (filePathFormat == null)
-            throw new DicomServiceException(
-                    Status.ProcessingFailure,
-                    "No StorageFilePathFormat configured for "
-                            + aeExt.getApplicationEntity().getAETitle());
-        synchronized (filePathFormat) {
-            return filePathFormat.format(attrs);
-        }
-    }
-
-    private Path move(Path spoolPath, Path fsPath, Path target)
-            throws IOException {
-        for (;;) {
-            try {
-                return Files.move(spoolPath, target);
-            } catch (FileAlreadyExistsException e) {
-                target = target.resolveSibling(
-                        target.getFileName().toString() + '-');
-            }
-        }
-    }
-
-    private Path createUniqueFile(Path path) throws IOException {
-        for (;;) {
-            try {
-                return Files.createFile(path);
-            } catch (FileAlreadyExistsException e) {
-                path = path.resolveSibling(
-                        path.getFileName().toString() + '-');
-            }
-        }
-    }
-
-
-    private Attributes parse(File file) throws IOException {
-        try (DicomInputStream in = new DicomInputStream(file)) {
-            in.setIncludeBulkData(IncludeBulkData.URI);
-            return in.readDataset(-1, -1);
-        }
-    }
-
-    private void storeTo(Association as, Attributes fmi, PDVInputStream data,
-            File file, MessageDigest digest) throws Exception {
-        try (DicomOutputStream out = digest == null
-                ? new DicomOutputStream(file)
-                : new DicomOutputStream(
-                        new BufferedOutputStream(
-                                new DigestOutputStream(
-                                        new FileOutputStream(file), digest)),
-                            UID.ExplicitVRLittleEndian)) {
-            out.writeFileMetaInformation(fmi);
-            data.copyTo(out);
-        }
-    }
-
-    private Path createSpoolPath(Path fsPath, ArchiveAEExtension aeExt,
-            String sourceAET, String cuid) throws DicomServiceException {
-        try {
-            String spoolDirectoryPath = aeExt.getSpoolDirectoryPath();
-            if (spoolDirectoryPath == null)
-                return Files.createTempFile("dcm", ".dcm");
-    
-            Path dir = fsPath.resolve(spoolDirectoryPath).resolve(sourceAET).resolve(cuid);
-            return Files.createTempFile(Files.createDirectories(dir), "dcm", ".dcm");
-        } catch (IOException e) {
-            throw new DicomServiceException(Status.ProcessingFailure, e);
-        }
-    }
-
-    private MessageDigest messageDigestOf(ArchiveAEExtension aeExt)
-            throws NoSuchAlgorithmException {
-        String algorithm = aeExt.getDigestAlgorithm();
-        return algorithm != null
-                ? MessageDigest.getInstance(algorithm)
-                : null;
-    }
-
-    private ArchiveAEExtension archiveAEExtensionOf(Association as)
-            throws DicomServiceException {
-        ApplicationEntity ae = as.getApplicationEntity();
-        ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
-        if (aeExt == null)
-            throw new DicomServiceException(
-                    Status.ProcessingFailure,
-                    "No ArchiveAEExtension configured for "
-                            + ae.getAETitle());
-        return aeExt;
-    }
-
-
-    private FileSystem selectStorageFileSystem(Association as,
-            ArchiveAEExtension aeExt) throws Exception {
-        FileSystem fs = (FileSystem) as.getProperty(FileSystem.class.getName());
-        if (fs == null) {
-            fs = storeService.selectStorageFileSystem(
-                    aeExt.getFileSystemGroupID(),
-                    aeExt.getInitFileSystemURI());
-            as.setProperty(FileSystem.class.getName(), fs);
-        }
-        return fs;
-    }
-
 
 }

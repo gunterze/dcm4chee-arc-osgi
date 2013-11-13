@@ -1,0 +1,49 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+  <ext:property-placeholder />
+
+  <service id="jmsService"
+      interface="org.dcm4chee.archive.jms.JmsService"
+      ref="jmsServiceImpl" />
+
+  <bean id="jmsServiceImpl"
+      class="org.dcm4chee.archive.jms.impl.JmsServiceImpl"
+      init-method="init"
+      destroy-method="destroy">
+    <property name="connectionFactory" ref="pooledConnectionFactory" />
+  </bean>
+
+  <!-- Setting up activemq Connection Factory using vm as URL     -->
+ 
+  <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="vm://amq-broker?create=false&amp;waitForStart=10000&amp;brokerConfig=xbean:file:${karaf.base}/etc/activemq.xml" />
+    <property name="userName" value="smx" />
+    <property name="password" value="smx" />
+  </bean>
+
+  
+  <bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+    <property name="maxConnections" value="8" />
+    <property name="connectionFactory" ref="activemqConnectionFactory" />
+  </bean>
+
+  <bean id="resourceManager" class="org.apache.activemq.pool.ActiveMQResourceManager" init-method="recoverResource">
+    <property name="transactionManager" ref="transactionManager" />
+    <property name="connectionFactory" ref="activemqConnectionFactory" />
+    <property name="resourceName" value="activemq.${name}" />
+  </bean>
+
+  <reference id="transactionManager" interface="javax.transaction.TransactionManager"/>
+
+  <!-- Exposed in osgi registry jms connection Factory-->
+
+  <service ref="pooledConnectionFactory" interface="javax.jms.ConnectionFactory">
+      <service-properties>
+          <entry key="name" value="localhost"/>
+      </service-properties>
+  </service>
+
+</blueprint>

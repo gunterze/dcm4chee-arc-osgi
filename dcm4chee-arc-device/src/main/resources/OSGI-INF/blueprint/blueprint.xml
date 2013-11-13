@@ -26,10 +26,14 @@
     init-method="init"
     destroy-method="destroy">
     <property name="dicomConfiguration" ref="dicomConfiguration" />
+    <property name="jmsService" ref="jmsService" />
     <property name="deviceName" value="${device-name}" />
   </bean>
 
   <reference id="dicomConfiguration"
     interface="org.dcm4che.conf.api.DicomConfiguration" />
+
+  <reference id="jmsService"
+    interface="org.dcm4chee.archive.jms.JmsService" />
 
 </blueprint>

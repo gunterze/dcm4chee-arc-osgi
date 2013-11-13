@@ -38,8 +38,6 @@
 
 package org.dcm4chee.archive.impl;
 
-import java.io.File;
-
 import org.dcm4che.conf.api.ApplicationEntityCache;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
@@ -56,6 +54,7 @@ import org.dcm4che.net.service.BasicCEchoSCP;
 import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
 import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
+import org.dcm4chee.archive.jms.JmsService;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -76,10 +75,12 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
 
     private String deviceName;
     private DicomConfiguration dicomConfig;
+    private JmsService jmsService;
     private final DicomServiceRegistry serviceRegistry = new DicomServiceRegistry();
     private final HL7ServiceRegistry hl7ServiceRegistry = new HL7ServiceRegistry();
 
     private ApplicationEntityCache aeCache;
+
 
     public ArchiveServiceImpl() {
         serviceRegistry.addDicomService(new BasicCEchoSCP());
@@ -106,6 +107,10 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     public void setDicomConfiguration(DicomConfiguration dicomConfig) {
         this.dicomConfig = dicomConfig;
         this.aeCache = new ApplicationEntityCache(dicomConfig);
+    }
+
+    public void setJmsService(JmsService jmsService) {
+        this.jmsService = jmsService;
     }
 
     public void init() throws Exception {
@@ -163,5 +168,17 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
         aeCache.setStaleTimeout(staleTimeout);
 //        hl7AppCache.setStaleTimeout(staleTimeout);
 //        WadoAttributesCache.INSTANCE.setStaleTimeout(ext.getWadoAttributesStaleTimeout());
+    }
+
+    @Override
+    public void start() throws Exception {
+        jmsService.start();
+        super.start();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        jmsService.stop();
     }
 }

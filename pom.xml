@@ -165,6 +165,9 @@
     <module>dcm4chee-arc-series</module>
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
+    <module>dcm4chee-arc-stgcmt</module>
+    <module>dcm4chee-arc-stgcmt-scp</module>
+    <module>dcm4chee-arc-jms</module>
   </modules>
   <build>
     <pluginManagement>

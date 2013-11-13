@@ -5,9 +5,9 @@
     <artifactId>dcm4chee-arc-parent</artifactId>
     <version>4.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>dcm4chee-arc-device</artifactId>
+  <artifactId>dcm4chee-arc-stgcmt</artifactId>
   <packaging>bundle</packaging>
-  <name>dcm4chee-arc-device</name>
+  <name>dcm4chee-arc-stgcmt</name>
   <build>
     <plugins>
       <plugin>
@@ -19,14 +19,29 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-conf</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-net</artifactId>
     </dependency>
     <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-jms</artifactId>
+      <artifactId>dcm4chee-arc-query-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
     </dependency>
   </dependencies>
 </project>

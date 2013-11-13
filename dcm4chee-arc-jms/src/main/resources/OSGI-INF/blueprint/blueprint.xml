@@ -13,7 +13,7 @@
       class="org.dcm4chee.archive.jms.impl.JmsServiceImpl"
       init-method="init"
       destroy-method="destroy">
-    <property name="connectionFactory" ref="pooledConnectionFactory" />
+    <property name="connectionFactory" ref="activemqConnectionFactory" />
   </bean>
 
   <!-- Setting up activemq Connection Factory using vm as URL     -->
@@ -24,12 +24,12 @@
     <property name="password" value="smx" />
   </bean>
 
-  
+  <!-- 
   <bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
     <property name="maxConnections" value="8" />
     <property name="connectionFactory" ref="activemqConnectionFactory" />
   </bean>
-
+-->
   <bean id="resourceManager" class="org.apache.activemq.pool.ActiveMQResourceManager" init-method="recoverResource">
     <property name="transactionManager" ref="transactionManager" />
     <property name="connectionFactory" ref="activemqConnectionFactory" />
@@ -38,12 +38,12 @@
 
   <reference id="transactionManager" interface="javax.transaction.TransactionManager"/>
 
-  <!-- Exposed in osgi registry jms connection Factory-->
+  <!-- Exposed in osgi registry jms connection Factory
 
-  <service ref="pooledConnectionFactory" interface="javax.jms.ConnectionFactory">
+  <service ref="activemqConnectionFactory" interface="javax.jms.ConnectionFactory">
       <service-properties>
           <entry key="name" value="localhost"/>
       </service-properties>
   </service>
-
+-->
 </blueprint>

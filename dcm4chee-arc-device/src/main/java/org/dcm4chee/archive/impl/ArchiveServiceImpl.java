@@ -38,6 +38,9 @@
 
 package org.dcm4chee.archive.impl;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+
 import org.dcm4che.conf.api.ApplicationEntityCache;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
@@ -75,11 +78,12 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
 
     private String deviceName;
     private DicomConfiguration dicomConfig;
-    private JmsService jmsService;
     private final DicomServiceRegistry serviceRegistry = new DicomServiceRegistry();
     private final HL7ServiceRegistry hl7ServiceRegistry = new HL7ServiceRegistry();
 
+    private Connection jmsConnection;
     private ApplicationEntityCache aeCache;
+
 
 
     public ArchiveServiceImpl() {
@@ -110,7 +114,7 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
     }
 
     public void setJmsService(JmsService jmsService) {
-        this.jmsService = jmsService;
+        this.jmsConnection = jmsService.getConnection();
     }
 
     public void init() throws Exception {
@@ -172,13 +176,17 @@ public class ArchiveServiceImpl extends DeviceService implements ArchiveService 
 
     @Override
     public void start() throws Exception {
-        jmsService.start();
+        jmsConnection.start();
         super.start();
     }
 
     @Override
     public void stop() {
         super.stop();
-        jmsService.stop();
+        try {
+            jmsConnection.stop();
+        } catch (JMSException e) {
+            // may already be closed
+        }
     }
 }

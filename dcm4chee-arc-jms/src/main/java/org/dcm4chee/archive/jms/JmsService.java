@@ -38,6 +38,7 @@
 
 package org.dcm4chee.archive.jms;
 
+import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
@@ -48,13 +49,11 @@ import javax.jms.Session;
  */
 public interface JmsService {
 
-    void start() throws JMSException;
-
-    void stop();
-
     Session createSession() throws JMSException;
 
     void sendMessage(Destination destination, MessageCreator messageCreator,
             long delay) throws JMSException;
+
+    Connection getConnection();
 
 }

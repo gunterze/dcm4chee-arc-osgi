@@ -65,24 +65,14 @@ public class JmsServiceImpl implements JmsService {
         conn = connectionFactory.createConnection();
     }
 
-    @Override
-    public void start() throws JMSException {
-        conn.start();
-    }
-
-    @Override
-    public void stop() {
-        try {
-            conn.stop();
-        } catch (JMSException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     public void destroy() throws JMSException {
         conn.close();
         conn = null;
+    }
+
+    @Override
+    public Connection getConnection() {
+        return conn;
     }
 
     @Override

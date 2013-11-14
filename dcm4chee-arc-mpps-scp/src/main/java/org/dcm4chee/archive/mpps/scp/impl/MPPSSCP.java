@@ -38,7 +38,9 @@
 
 package org.dcm4chee.archive.mpps.scp.impl;
 
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Attributes;
+import org.dcm4che.data.Issuer;
 import org.dcm4che.data.Tag;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Association;
@@ -49,7 +51,9 @@ import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
 import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
+import org.dcm4chee.archive.entity.PerformedProcedureStep;
 import org.dcm4chee.archive.mpps.MPPSService;
+import org.dcm4chee.archive.mpps.scu.MPPSSCU;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -58,6 +62,7 @@ public class MPPSSCP extends BasicMPPSSCP {
 
     private ArchiveService archiveService;
     private MPPSService mppsService;
+    private MPPSSCU mppsSCU;
     private DicomServiceRegistry registry;
 
     public void setArchiveService(ArchiveService archiveService) {
@@ -66,6 +71,10 @@ public class MPPSSCP extends BasicMPPSSCP {
 
     public void setMppsService(MPPSService mppsService) {
         this.mppsService = mppsService;
+    }
+
+    public void setMppsSCU(MPPSSCU mppsSCU) {
+        this.mppsSCU = mppsSCU;
     }
 
     public void init() {
@@ -101,26 +110,25 @@ public class MPPSSCP extends BasicMPPSSCP {
         } catch (Exception e) {
             throw new DicomServiceException(Status.ProcessingFailure, e);
         }
-//        for (String remoteAET : aeExt.getForwardMPPSDestinations())
-//            if (matchIssuerOfPatientID(remoteAET, rqAttrs))
-//                Archive.getInstance()
-//                        .scheduleMPPSCreate(localAET, remoteAET, iuid, rqAttrs);
+        for (String remoteAET : aeExt.getForwardMPPSDestinations())
+            if (matchIssuerOfPatientID(remoteAET, rqAttrs))
+                mppsSCU.createMPPS(localAET, remoteAET, iuid, rqAttrs);
         return null;
     }
 
-//    private boolean matchIssuerOfPatientID(String remoteAET, Attributes rqAttrs) {
-//        Issuer issuer = Issuer.fromIssuerOfPatientID(rqAttrs);
-//        if (issuer == null)
-//            return true;
-//
-//        try {
-//            ApplicationEntity remoteAE = archiveService
-//                    .findApplicationEntity(remoteAET);
-//            return issuer.matches(remoteAE.getDevice().getIssuerOfPatientID());
-//        } catch (ConfigurationException e) {
-//            return true;
-//        }
-//    }
+    private boolean matchIssuerOfPatientID(String remoteAET, Attributes rqAttrs) {
+        Issuer issuer = Issuer.fromIssuerOfPatientID(rqAttrs);
+        if (issuer == null)
+            return true;
+
+        try {
+            ApplicationEntity remoteAE = archiveService
+                    .findApplicationEntity(remoteAET);
+            return issuer.matches(remoteAE.getDevice().getIssuerOfPatientID());
+        } catch (ConfigurationException e) {
+            return true;
+        }
+    }
 
     @Override
     protected Attributes set(Association as, Attributes rq, Attributes rqAttrs,
@@ -129,18 +137,18 @@ public class MPPSSCP extends BasicMPPSSCP {
         String iuid = rq.getString(Tag.RequestedSOPInstanceUID);
         ApplicationEntity ae = as.getApplicationEntity();
         ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
+        PerformedProcedureStep pps;
         try {
-            mppsService.updatePerformedProcedureStep(iuid, rqAttrs,
+            pps = mppsService.updatePerformedProcedureStep(iuid, rqAttrs,
                     StoreParam.valueOf(aeExt));
         } catch (DicomServiceException e) {
             throw e;
         } catch (Exception e) {
             throw new DicomServiceException(Status.ProcessingFailure, e);
         }
-//        for (String remoteAET : aeExt.getForwardMPPSDestinations())
-//            if (matchIssuerOfPatientID(remoteAET, ppsWithIAN.pps.getPatient().getAttributes()))
-//                Archive.getInstance()
-//                        .scheduleMPPSSet(localAET, remoteAET, iuid, rqAttrs);
+        for (String remoteAET : aeExt.getForwardMPPSDestinations())
+            if (matchIssuerOfPatientID(remoteAET, pps.getPatient().getAttributes()))
+                mppsSCU.updateMPPS(localAET, remoteAET, iuid, rqAttrs);
 //        List<Attributes> ians = ppsWithIAN.ians;
 //        Archive r = Archive.getInstance();
 //        if (ians != null && !ians.isEmpty())

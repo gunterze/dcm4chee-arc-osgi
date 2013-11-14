@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<features>
+  <feature name="dcm4chee">
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-compress/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf-ldap/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-entity/${project.version}/jar/${db}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-common/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-code/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-issuer/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-patient/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-request/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-series/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-store/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-stgcmt/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-query-common/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-query/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-retrieve/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-jms/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-device/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps-scu/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps-scp/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-store-scp/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-stgcmt-scp/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-query-scp/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-retrieve-scp/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-rs-control/${project.version}</bundle>
+
+<!-- TODO: It seems that the persistence unit bundle needs to be started
+    before hibernate-osgi. When the BundleActivator is started,
+    the persistence unit is provided even though managed-jpa
+    hasn't completely started yet. If that happens, you'll get an "illegal
+    bundle state" exception. Is there a way for the activator to
+    watch for bundles with PUs before registering the persistence provider? -->
+    <bundle>mvn:org.hibernate/hibernate-osgi/${hibernate.version}</bundle>
+
+  </feature>
+</features>

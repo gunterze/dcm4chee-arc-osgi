@@ -218,11 +218,12 @@ public class StgCmtSCP extends DicomService implements MessageListener {
             ArchiveAEExtension aeExt = localAE.getAEExtension(ArchiveAEExtension.class);
             if (aeExt != null && retries < aeExt.getStorageCommitmentMaxRetries()) {
                 int delay = aeExt.getStorageCommitmentRetryInterval();
-                LOG.info("Failed to return Storage Commitment Result to "
-                            + remoteAET + " - retry in "  + delay + "s", e);
+                LOG.info("Failed to return Storage Commitment Result to {} - retry in {}s: {}",
+                        remoteAET, delay, e);
                 scheduleNEventReport(localAET, remoteAET, eventInfo, retries + 1, delay * 1000L);
             } else {
-                LOG.warn("Failed to return Storage Commitment Result to " + remoteAET, e);
+                LOG.warn("Failed to return Storage Commitment Result to {}: {}",
+                        remoteAET, e);
             }
         }
     }

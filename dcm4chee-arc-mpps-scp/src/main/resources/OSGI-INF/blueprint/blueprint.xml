@@ -9,6 +9,7 @@
         destroy-method="destroy">
         <property name="archiveService" ref="archiveService" />
         <property name="mppsService" ref="mppsService" />
+        <property name="mppsSCU" ref="mppsSCU" />
     </bean>
 
     <reference id="archiveService"
@@ -16,5 +17,8 @@
 
     <reference id="mppsService"
         interface="org.dcm4chee.archive.mpps.MPPSService" />
+
+    <reference id="mppsSCU"
+        interface="org.dcm4chee.archive.mpps.scu.MPPSSCU" />
 
 </blueprint>

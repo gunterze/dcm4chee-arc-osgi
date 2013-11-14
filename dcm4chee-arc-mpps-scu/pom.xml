@@ -5,9 +5,9 @@
     <artifactId>dcm4chee-arc-parent</artifactId>
     <version>4.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>dcm4chee-arc-mpps-scp</artifactId>
+  <artifactId>dcm4chee-arc-mpps-scu</artifactId>
   <packaging>bundle</packaging>
-  <name>dcm4chee-arc-mpps-scp</name>
+  <name>dcm4chee-arc-mpps-scu</name>
   <build>
     <plugins>
       <plugin>
@@ -23,15 +23,14 @@
       <artifactId>dcm4chee-arc-device</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
+     <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-mpps</artifactId>
+      <artifactId>dcm4chee-arc-jms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.dcm4che.dcm4chee-arc</groupId>
-      <artifactId>dcm4chee-arc-mpps-scu</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_1.1_spec</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -36,18 +36,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.common;
-
-import java.util.EnumSet;
+package org.dcm4chee.archive.conf;
 
 import org.dcm4che.data.Issuer;
-import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Device;
-import org.dcm4che.net.QueryOption;
 import org.dcm4che.soundex.FuzzyStr;
-import org.dcm4chee.archive.conf.ArchiveAEExtension;
-import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
-import org.dcm4chee.archive.conf.AttributeFilter;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -155,31 +148,10 @@ public class QueryParam {
         this.defaultIssuerOfAccessionNumber = issuer;
     }
 
-    public static QueryParam valueOf(ApplicationEntity ae,
-            EnumSet<QueryOption> queryOpts, String[] accessControlIDs) {
-        ArchiveDeviceExtension devExt = ae.getDevice()
-                .getDeviceExtension(ArchiveDeviceExtension.class);
-        ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
-        QueryParam queryParam = new QueryParam();
-        queryParam.setFuzzyStr(devExt.getFuzzyStr());
-        queryParam.setAttributeFilters(devExt.getAttributeFilters());
-        queryParam.setCombinedDatetimeMatching(queryOpts
-                .contains(QueryOption.DATETIME));
-        queryParam.setFuzzySemanticMatching(queryOpts
-                .contains(QueryOption.FUZZY));
-        queryParam.setMatchUnknown(aeExt.isMatchUnknown());
-        queryParam.setAccessControlIDs(accessControlIDs);
-        queryParam.setShowRejectedInstances(aeExt.isShowRejectedInstances());
-        queryParam.setReturnOtherPatientIDs(aeExt.isReturnOtherPatientIDs());
-        queryParam.setReturnOtherPatientNames(aeExt.isReturnOtherPatientNames());
-
-        return queryParam;
-    }
-
     public void setDefaultIssuer(Device sourceDevice) {
         setDefaultIssuerOfPatientID(sourceDevice
                 .getIssuerOfPatientID());
         setDefaultIssuerOfAccessionNumber(sourceDevice
                 .getIssuerOfAccessionNumber());
-     }
+    }
 }

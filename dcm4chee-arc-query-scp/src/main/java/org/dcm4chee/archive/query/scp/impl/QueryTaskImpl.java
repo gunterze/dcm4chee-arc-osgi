@@ -52,7 +52,7 @@ import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.BasicQueryTask;
 import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.util.StringUtils;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.query.Query;
 import org.dcm4chee.archive.query.common.QueryPatientNamesService;
 

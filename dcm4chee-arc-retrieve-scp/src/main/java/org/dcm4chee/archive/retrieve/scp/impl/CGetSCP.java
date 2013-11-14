@@ -61,8 +61,8 @@ import org.dcm4che.net.service.InstanceLocator;
 import org.dcm4che.net.service.QueryRetrieveLevel;
 import org.dcm4che.net.service.RetrieveTask;
 import org.dcm4chee.archive.ArchiveService;
-import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.query.common.QueryPatientNamesService;
 import org.dcm4chee.archive.retrieve.RetrieveService;
 
@@ -126,7 +126,7 @@ public class CGetSCP extends BasicCGetSCP {
         ApplicationEntity ae = as.getApplicationEntity();
         ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
         try {
-            QueryParam queryParam = QueryParam.valueOf(ae, queryOpts,
+            QueryParam queryParam = aeExt.getQueryParam(queryOpts,
                     accessControlIDs());
             ApplicationEntity sourceAE = null;
             try {

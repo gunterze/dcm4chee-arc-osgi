@@ -47,7 +47,7 @@ import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.data.Tag;
 import org.dcm4che.net.service.InstanceLocator;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.entity.Availability;
 import org.dcm4chee.archive.entity.Utils;
 import org.dcm4chee.archive.entity.query.types.QFileRef;

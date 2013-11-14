@@ -40,7 +40,7 @@ package org.dcm4chee.archive.series.impl;
 import javax.persistence.EntityManager;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.entity.Availability;
 import org.dcm4chee.archive.entity.Instance;
 import org.dcm4chee.archive.entity.PatientStudySeriesAttributes;

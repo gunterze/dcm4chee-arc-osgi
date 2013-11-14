@@ -57,7 +57,8 @@ import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4che.net.service.QueryRetrieveLevel;
 import org.dcm4che.net.service.QueryTask;
 import org.dcm4chee.archive.ArchiveService;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.ArchiveAEExtension;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.query.Query;
 import org.dcm4chee.archive.query.QueryService;
 import org.dcm4chee.archive.query.common.QueryPatientNamesService;
@@ -117,8 +118,9 @@ public class CFindSCP extends BasicCFindSCP {
         qrlevel.validateQueryKeys(keys, rootLevel, relational);
 
         ApplicationEntity ae = as.getApplicationEntity();
+        ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
         try {
-            QueryParam queryParam = QueryParam.valueOf(ae, queryOpts,
+            QueryParam queryParam = aeExt.getQueryParam(queryOpts,
                     accessControlID(as));
             try {
                 queryParam.setDefaultIssuer(

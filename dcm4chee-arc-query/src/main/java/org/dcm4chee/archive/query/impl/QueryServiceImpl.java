@@ -43,7 +43,7 @@ import javax.persistence.EntityManager;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.net.service.QueryRetrieveLevel;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.query.Query;
 import org.dcm4chee.archive.query.QueryService;
 import org.dcm4chee.archive.series.SeriesService;

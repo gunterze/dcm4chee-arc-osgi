@@ -40,7 +40,7 @@ package org.dcm4chee.archive.query.common;
 
 import org.dcm4che.data.PersonName;
 import org.dcm4che.soundex.FuzzyStr;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.ExpressionUtils;

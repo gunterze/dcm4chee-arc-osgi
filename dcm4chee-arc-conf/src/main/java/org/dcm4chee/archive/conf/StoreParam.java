@@ -36,23 +36,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.common;
+package org.dcm4chee.archive.conf;
 
 import java.util.List;
 
-import org.dcm4che.data.Attributes;
 import org.dcm4che.data.Code;
-import org.dcm4che.data.Tag;
-import org.dcm4che.data.UID;
-import org.dcm4che.net.Device;
 import org.dcm4che.soundex.FuzzyStr;
-import org.dcm4chee.archive.conf.ArchiveAEExtension;
-import org.dcm4chee.archive.conf.ArchiveDeviceExtension;
-import org.dcm4chee.archive.conf.AttributeFilter;
-import org.dcm4chee.archive.conf.Entity;
-import org.dcm4chee.archive.conf.StoreDuplicate;
-import org.dcm4chee.archive.entity.Availability;
-import org.dcm4chee.archive.entity.PerformedProcedureStep;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -176,68 +165,39 @@ public class StoreParam {
         return StoreDuplicate.Action.IGNORE;
     }
 
-    public boolean isRejectedByMPPS(PerformedProcedureStep mpps) {
-        if (mpps == null || mpps.getStatus() != PerformedProcedureStep.Status.DISCONTINUED)
-            return false;
+//    public boolean isRejectedByMPPS(PerformedProcedureStep mpps) {
+//        if (mpps == null || mpps.getStatus() != PerformedProcedureStep.Status.DISCONTINUED)
+//            return false;
+//
+//        Attributes reasonCode = mpps.getAttributes().getNestedDataset(
+//                Tag.PerformedProcedureStepDiscontinuationReasonCodeSequence);
+//        return reasonCode != null && new Code(reasonCode)
+//                .equalsIgnoreMeaning(incorrectWorklistEntrySelectedCode);
+//    }
+//
+//    public Availability getRejectionNoteAvailability(Attributes attrs) {
+//        if (!attrs.getString(Tag.SOPClassUID)
+//                .equals(UID.KeyObjectSelectionDocumentStorage))
+//            return null;
+//
+//        Attributes item = attrs.getNestedDataset(Tag.ConceptNameCodeSequence);
+//        if (item == null)
+//            return null;
+//
+//        Code code = new Code(item);
+//        if (code.equalsIgnoreMeaning(rejectedForQualityReasonsCode))
+//            return Availability.REJECTED_FOR_QUALITY_REASONS_REJECTION_NOTE;
+//        
+//        if (code.equalsIgnoreMeaning(rejectedForPatientSafetyReasonsCode))
+//            return Availability.REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE;
+//        
+//        if (code.equalsIgnoreMeaning(incorrectModalityWorklistEntryCode))
+//            return Availability.INCORRECT_MODALITY_WORKLIST_ENTRY_REJECTION_NOTE;
+//
+//        if (code.equalsIgnoreMeaning(dataRetentionPeriodExpiredCode))
+//            return Availability.DATA_RETENTION_PERIOD_EXPIRED_REJECTION_NOTE;
+//
+//        return null;
+//    }
 
-        Attributes reasonCode = mpps.getAttributes().getNestedDataset(
-                Tag.PerformedProcedureStepDiscontinuationReasonCodeSequence);
-        return reasonCode != null && new Code(reasonCode)
-                .equalsIgnoreMeaning(incorrectWorklistEntrySelectedCode);
-    }
-
-    public Availability getRejectionNoteAvailability(Attributes attrs) {
-        if (!attrs.getString(Tag.SOPClassUID)
-                .equals(UID.KeyObjectSelectionDocumentStorage))
-            return null;
-
-        Attributes item = attrs.getNestedDataset(Tag.ConceptNameCodeSequence);
-        if (item == null)
-            return null;
-
-        Code code = new Code(item);
-        if (code.equalsIgnoreMeaning(rejectedForQualityReasonsCode))
-            return Availability.REJECTED_FOR_QUALITY_REASONS_REJECTION_NOTE;
-        
-        if (code.equalsIgnoreMeaning(rejectedForPatientSafetyReasonsCode))
-            return Availability.REJECTED_FOR_PATIENT_SAFETY_REASONS_REJECTION_NOTE;
-        
-        if (code.equalsIgnoreMeaning(incorrectModalityWorklistEntryCode))
-            return Availability.INCORRECT_MODALITY_WORKLIST_ENTRY_REJECTION_NOTE;
-
-        if (code.equalsIgnoreMeaning(dataRetentionPeriodExpiredCode))
-            return Availability.DATA_RETENTION_PERIOD_EXPIRED_REJECTION_NOTE;
-
-        return null;
-    }
-
-    public static StoreParam valueOf(Device dev) {
-        ArchiveDeviceExtension devExt =
-                dev.getDeviceExtension(ArchiveDeviceExtension.class);
-        StoreParam storeParam = new StoreParam();
-        storeParam.setIncorrectWorklistEntrySelectedCode(
-                (Code) devExt.getIncorrectWorklistEntrySelectedCode());
-        storeParam.setRejectedForQualityReasonsCode(
-                (Code) devExt.getRejectedForQualityReasonsCode());
-        storeParam.setRejectedForPatientSafetyReasonsCode(
-                (Code) devExt.getRejectedForPatientSafetyReasonsCode());
-        storeParam.setIncorrectModalityWorklistEntryCode(
-                (Code) devExt.getIncorrectModalityWorklistEntryCode());
-        storeParam.setDataRetentionPeriodExpiredCode(
-                (Code) devExt.getDataRetentionPeriodExpiredCode());
-        storeParam.setFuzzyStr(devExt.getFuzzyStr());
-        storeParam.setAttributeFilters(devExt.getAttributeFilters());
-        return storeParam;
-    }
-
-    public static StoreParam valueOf(ArchiveAEExtension aeExt) {
-        StoreParam storeParam = StoreParam.valueOf(
-                aeExt.getApplicationEntity().getDevice());
-        storeParam.setStoreOriginalAttributes(aeExt.isStoreOriginalAttributes());
-        storeParam.setModifyingSystem(aeExt.getEffectiveModifyingSystem());
-        storeParam.setRetrieveAETs(aeExt.getRetrieveAETs());
-        storeParam.setExternalRetrieveAET(aeExt.getExternalRetrieveAET());
-        storeParam.setStoreDuplicates(aeExt.getStoreDuplicates());
-        return storeParam;
-    }
 }

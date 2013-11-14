@@ -39,7 +39,7 @@
 package org.dcm4chee.archive.request;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.common.StoreParam;
+import org.dcm4chee.archive.conf.StoreParam;
 import org.dcm4chee.archive.entity.Patient;
 import org.dcm4chee.archive.entity.ScheduledProcedureStep;
 

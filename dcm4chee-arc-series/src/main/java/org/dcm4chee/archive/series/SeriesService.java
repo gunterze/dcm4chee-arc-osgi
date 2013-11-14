@@ -39,7 +39,7 @@
 package org.dcm4chee.archive.series;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4chee.archive.common.QueryParam;
+import org.dcm4chee.archive.conf.QueryParam;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>

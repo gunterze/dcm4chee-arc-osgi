@@ -66,7 +66,6 @@ import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.util.AttributesFormat;
 import org.dcm4che.util.TagUtils;
-import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.FileRef;
 import org.dcm4chee.archive.entity.FileSystem;
@@ -276,7 +275,7 @@ class StoreInstance implements Closeable {
                 file.length(), 
                 fileDigest);
         Attributes modified = new Attributes();
-        if (scp.getStoreService().store(StoreParam.valueOf(aeExt), 
+        if (scp.getStoreService().store(aeExt.getStoreParam(), 
                 sourceAET, attrs, fileRef, modified)) {
             storePath = null;
         }

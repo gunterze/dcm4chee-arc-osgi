@@ -5,7 +5,6 @@
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf-ldap/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-entity/${project.version}/jar/${db}</bundle>
-    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-common/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-code/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-issuer/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-patient/${project.version}</bundle>

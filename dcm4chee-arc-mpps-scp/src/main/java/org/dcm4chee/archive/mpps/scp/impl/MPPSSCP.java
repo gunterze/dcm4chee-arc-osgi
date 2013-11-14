@@ -49,7 +49,6 @@ import org.dcm4che.net.service.BasicMPPSSCP;
 import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
-import org.dcm4chee.archive.common.StoreParam;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.PerformedProcedureStep;
 import org.dcm4chee.archive.mpps.MPPSService;
@@ -104,7 +103,7 @@ public class MPPSSCP extends BasicMPPSSCP {
 //            } catch (ConfigurationNotFoundException e) {
 //            }
             mppsService.createPerformedProcedureStep(iuid , rqAttrs,
-                    StoreParam.valueOf(aeExt));
+                    aeExt.getStoreParam());
         } catch (DicomServiceException e) {
             throw e;
         } catch (Exception e) {
@@ -140,7 +139,7 @@ public class MPPSSCP extends BasicMPPSSCP {
         PerformedProcedureStep pps;
         try {
             pps = mppsService.updatePerformedProcedureStep(iuid, rqAttrs,
-                    StoreParam.valueOf(aeExt));
+                    aeExt.getStoreParam());
         } catch (DicomServiceException e) {
             throw e;
         } catch (Exception e) {

@@ -47,7 +47,6 @@ import java.util.List;
 
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.ConfigurationNotFoundException;
-import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.IDWithIssuer;
 import org.dcm4che.data.Tag;
@@ -65,8 +64,8 @@ import org.dcm4che.net.service.InstanceLocator;
 import org.dcm4che.net.service.QueryRetrieveLevel;
 import org.dcm4che.net.service.RetrieveTask;
 import org.dcm4chee.archive.ArchiveService;
-import org.dcm4chee.archive.common.QueryParam;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
+import org.dcm4chee.archive.conf.QueryParam;
 import org.dcm4chee.archive.query.common.QueryPatientNamesService;
 import org.dcm4chee.archive.retrieve.RetrieveService;
 
@@ -129,7 +128,8 @@ public class CMoveSCP extends BasicCMoveSCP {
                     archiveService.findApplicationEntity(dest);
             ApplicationEntity ae = as.getApplicationEntity();
             ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
-            QueryParam queryParam = QueryParam.valueOf(ae, queryOpts, accessControlIDs());
+            QueryParam queryParam = aeExt.getQueryParam(queryOpts,
+                    accessControlIDs());
             try {
                 queryParam.setDefaultIssuer(
                         archiveService.findApplicationEntity(as.getRemoteAET())

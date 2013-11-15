@@ -38,27 +38,16 @@
 
 package org.dcm4chee.archive.mpps;
 
-import java.util.List;
-
-import org.dcm4che.data.Attributes;
-import org.dcm4che.net.service.DicomServiceException;
-import org.dcm4chee.archive.conf.StoreParam;
-import org.dcm4chee.archive.entity.PerformedProcedureStep;
-
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface MPPSService {
+public class SOPClassMismatchException extends Exception {
 
-    PerformedProcedureStep createPerformedProcedureStep(String sopInstanceUID,
-            Attributes attrs, StoreParam storeParam)
-            throws DicomServiceException;
+    private static final long serialVersionUID = -5566267223962262309L;
 
-    PerformedProcedureStep updatePerformedProcedureStep(String sopInstanceUID,
-            Attributes attrs, StoreParam storeParam)
-            throws DicomServiceException;
+    public SOPClassMismatchException(String message) {
+        super(message);
+    }
 
-    List<Attributes> checkInstanceAvailability(String sopInstanceUID,
-            Attributes attrs) throws SOPClassMismatchException;
 }

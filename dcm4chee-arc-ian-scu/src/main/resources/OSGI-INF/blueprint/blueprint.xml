@@ -1,0 +1,23 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <service id="ianSCU"
+    interface="org.dcm4chee.archive.ian.scu.IANSCU"
+    ref="ianSCUImpl" />
+
+  <bean id="ianSCUImpl"
+    class="org.dcm4chee.archive.ian.scu.impl.IANSCUImpl"
+    init-method="init"
+    destroy-method="destroy">
+    <property name="archiveService" ref="archiveService" />
+    <property name="jmsService" ref="jmsService" />
+  </bean>
+
+  <reference id="archiveService"
+    interface="org.dcm4chee.archive.ArchiveService" />
+
+  <reference id="jmsService"
+    interface="org.dcm4chee.archive.jms.JmsService" />
+
+</blueprint>

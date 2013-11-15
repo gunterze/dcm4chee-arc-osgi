@@ -174,4 +174,5 @@ public class PerformedProcedureStep implements Serializable {
         encodedAttributes = Utils.encodeAttributes(
                 cachedAttributes = new Attributes(attrs, filter.getSelection()));
     }
+
 }

@@ -38,9 +38,12 @@
 
 package org.dcm4chee.archive.mpps.scp.impl;
 
+import java.util.List;
+
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.Issuer;
+import org.dcm4che.data.Sequence;
 import org.dcm4che.data.Tag;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Association;
@@ -51,7 +54,9 @@ import org.dcm4che.net.service.DicomServiceRegistry;
 import org.dcm4chee.archive.ArchiveService;
 import org.dcm4chee.archive.conf.ArchiveAEExtension;
 import org.dcm4chee.archive.entity.PerformedProcedureStep;
+import org.dcm4chee.archive.ian.scu.IANSCU;
 import org.dcm4chee.archive.mpps.MPPSService;
+import org.dcm4chee.archive.mpps.SOPClassMismatchException;
 import org.dcm4chee.archive.mpps.scu.MPPSSCU;
 
 /**
@@ -62,6 +67,8 @@ public class MPPSSCP extends BasicMPPSSCP {
     private ArchiveService archiveService;
     private MPPSService mppsService;
     private MPPSSCU mppsSCU;
+    private IANSCU ianSCU;
+
     private DicomServiceRegistry registry;
 
     public void setArchiveService(ArchiveService archiveService) {
@@ -74,6 +81,10 @@ public class MPPSSCP extends BasicMPPSSCP {
 
     public void setMppsSCU(MPPSSCU mppsSCU) {
         this.mppsSCU = mppsSCU;
+    }
+
+    public void setIanSCU(IANSCU ianSCU) {
+        this.ianSCU = ianSCU;
     }
 
     public void init() {
@@ -102,6 +113,8 @@ public class MPPSSCP extends BasicMPPSSCP {
 //                Supplements.supplementMPPS(rqAttrs, sourceAE.getDevice());
 //            } catch (ConfigurationNotFoundException e) {
 //            }
+            if (rqAttrs.containsValue(Tag.PerformedSeriesSequence))
+                mppsService.checkInstanceAvailability(iuid, rqAttrs);
             mppsService.createPerformedProcedureStep(iuid , rqAttrs,
                     aeExt.getStoreParam());
         } catch (DicomServiceException e) {
@@ -137,7 +150,10 @@ public class MPPSSCP extends BasicMPPSSCP {
         ApplicationEntity ae = as.getApplicationEntity();
         ArchiveAEExtension aeExt = ae.getAEExtension(ArchiveAEExtension.class);
         PerformedProcedureStep pps;
+        List<Attributes> ians = null;
         try {
+            if (rqAttrs.containsValue(Tag.PerformedSeriesSequence))
+                ians = mppsService.checkInstanceAvailability(iuid, rqAttrs);
             pps = mppsService.updatePerformedProcedureStep(iuid, rqAttrs,
                     aeExt.getStoreParam());
         } catch (DicomServiceException e) {
@@ -145,17 +161,64 @@ public class MPPSSCP extends BasicMPPSSCP {
         } catch (Exception e) {
             throw new DicomServiceException(Status.ProcessingFailure, e);
         }
+
         for (String remoteAET : aeExt.getForwardMPPSDestinations())
-            if (matchIssuerOfPatientID(remoteAET, pps.getPatient().getAttributes()))
+            if (matchIssuerOfPatientID(remoteAET, 
+                    pps.getPatient().getAttributes()))
                 mppsSCU.updateMPPS(localAET, remoteAET, iuid, rqAttrs);
-//        List<Attributes> ians = ppsWithIAN.ians;
-//        Archive r = Archive.getInstance();
-//        if (ians != null && !ians.isEmpty())
-//            for (String remoteAET1 : ae.getAEExtension(ArchiveAEExtension.class)
-//                    .getIANDestinations())
-//                for (Attributes ian : ians)
-//                    r.scheduleIAN(ae.getAETitle(), remoteAET1, ian);
+
+        String[] ianDestinations = aeExt.getIANDestinations();
+        if (ianDestinations.length > 0 
+                && pps.getStatus() != PerformedProcedureStep.Status.IN_PROGRESS) {
+            Attributes ppsAttrs = pps.getAttributes();
+            if (ians == null) {
+                // final N-SET did not contain (0040,0340) Performed Series Sequence 
+                try {
+                    ians = mppsService.checkInstanceAvailability(iuid, ppsAttrs);
+                } catch (SOPClassMismatchException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            if (isIANComplete(ians, ppsAttrs)) {
+                for (String remoteAET : ianDestinations) {
+                    for (Attributes ian : ians) {
+                        ianSCU.createIAN(localAET, remoteAET, ian);
+                    }
+                }
+            }
+        }
         return null;
+    }
+
+    private boolean isIANComplete(List<Attributes> ians, Attributes ppsAttrs) {
+        if (ians == null || ians.isEmpty())
+            return false;
+
+        int count = 0;
+        for (Attributes ian : ians) {
+            Sequence refSeriesSeq =
+                    ian.getSequence(Tag.ReferencedSeriesSequence);
+            for (Attributes refSeries : refSeriesSeq) {
+                Sequence refSOPs =
+                        refSeries.getSequence(Tag.ReferencedSOPSequence);
+                count += refSOPs.size();
+            }
+        }
+        for (Attributes perfSeries :
+                ppsAttrs.getSequence(Tag.PerformedSeriesSequence)) {
+            Sequence refImgs =
+                    perfSeries.getSequence(Tag.ReferencedImageSequence);
+            Sequence refNonImgs =
+                    perfSeries.getSequence(Tag.ReferencedNonImageCompositeSOPInstanceSequence);
+            if (refImgs != null)
+                count -= refImgs.size();
+            if (refNonImgs != null)
+                count -= refNonImgs.size();
+            if (count < 0)
+                return false;
+        }
+        return true;
     }
 
 }

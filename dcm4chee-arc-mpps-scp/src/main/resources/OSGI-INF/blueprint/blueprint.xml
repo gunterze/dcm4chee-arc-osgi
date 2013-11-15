@@ -10,6 +10,7 @@
         <property name="archiveService" ref="archiveService" />
         <property name="mppsService" ref="mppsService" />
         <property name="mppsSCU" ref="mppsSCU" />
+        <property name="ianSCU" ref="ianSCU" />
     </bean>
 
     <reference id="archiveService"
@@ -20,5 +21,8 @@
 
     <reference id="mppsSCU"
         interface="org.dcm4chee.archive.mpps.scu.MPPSSCU" />
+
+    <reference id="ianSCU"
+        interface="org.dcm4chee.archive.ian.scu.IANSCU" />
 
 </blueprint>

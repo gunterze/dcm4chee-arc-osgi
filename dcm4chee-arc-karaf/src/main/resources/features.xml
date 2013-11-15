@@ -18,6 +18,7 @@
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-retrieve/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-jms/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-device/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-ian-scu/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps-scu/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps-scp/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-store-scp/${project.version}</bundle>

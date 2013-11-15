@@ -150,6 +150,7 @@
     <module>dcm4chee-arc-conf-prefs</module>
     <module>dcm4chee-arc-device</module>
     <module>dcm4chee-arc-entity</module>
+    <module>dcm4chee-arc-ian-scu</module>
     <module>dcm4chee-arc-issuer</module>
     <module>dcm4chee-arc-jms</module>
     <module>dcm4chee-arc-karaf</module>

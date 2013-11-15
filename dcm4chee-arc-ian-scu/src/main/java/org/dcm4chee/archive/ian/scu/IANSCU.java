@@ -36,29 +36,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.archive.mpps;
-
-import java.util.List;
+package org.dcm4chee.archive.ian.scu;
 
 import org.dcm4che.data.Attributes;
-import org.dcm4che.net.service.DicomServiceException;
-import org.dcm4chee.archive.conf.StoreParam;
-import org.dcm4chee.archive.entity.PerformedProcedureStep;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  *
  */
-public interface MPPSService {
+public interface IANSCU {
 
-    PerformedProcedureStep createPerformedProcedureStep(String sopInstanceUID,
-            Attributes attrs, StoreParam storeParam)
-            throws DicomServiceException;
+    void createIAN(String localAET, String remoteAET, Attributes ian);
 
-    PerformedProcedureStep updatePerformedProcedureStep(String sopInstanceUID,
-            Attributes attrs, StoreParam storeParam)
-            throws DicomServiceException;
-
-    List<Attributes> checkInstanceAvailability(String sopInstanceUID,
-            Attributes attrs) throws SOPClassMismatchException;
 }

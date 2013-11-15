@@ -40,6 +40,8 @@ package org.dcm4chee.archive.mpps.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -47,15 +49,21 @@ import javax.persistence.NoResultException;
 import org.dcm4che.data.Attributes;
 import org.dcm4che.data.Sequence;
 import org.dcm4che.data.Tag;
+import org.dcm4che.data.UID;
+import org.dcm4che.data.VR;
 import org.dcm4che.net.Status;
 import org.dcm4che.net.service.BasicMPPSSCP;
 import org.dcm4che.net.service.DicomServiceException;
 import org.dcm4chee.archive.conf.Entity;
 import org.dcm4chee.archive.conf.StoreParam;
+import org.dcm4chee.archive.entity.Instance;
 import org.dcm4chee.archive.entity.Patient;
 import org.dcm4chee.archive.entity.PerformedProcedureStep;
+import org.dcm4chee.archive.entity.SOPInstanceReference;
 import org.dcm4chee.archive.entity.ScheduledProcedureStep;
+import org.dcm4chee.archive.entity.Utils;
 import org.dcm4chee.archive.mpps.MPPSService;
+import org.dcm4chee.archive.mpps.SOPClassMismatchException;
 import org.dcm4chee.archive.patient.PatientService;
 import org.dcm4chee.archive.request.RequestService;
 
@@ -200,6 +208,116 @@ public class MPPSServiceImpl implements MPPSService {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<Attributes> checkInstanceAvailability(String ppsInstanceUID,
+            Attributes attrs) throws SOPClassMismatchException {
+        Sequence perfSeriesSeq = attrs.getSequence(Tag.PerformedSeriesSequence);
+        if (perfSeriesSeq == null || perfSeriesSeq.isEmpty())
+            return Collections.emptyList();
+
+        int numS = perfSeriesSeq.size();
+        List<Attributes> ians = new ArrayList<Attributes>(numS);
+        for (Attributes perfSeries : perfSeriesSeq) {
+            Sequence refImgs =
+                    perfSeries.getSequence(Tag.ReferencedImageSequence);
+            Sequence refNonImgs =
+                    perfSeries.getSequence(Tag.ReferencedNonImageCompositeSOPInstanceSequence);
+            int numI = 0;
+            if (refImgs != null)
+                numI += refImgs.size();
+            if (refNonImgs != null)
+                numI += refNonImgs.size();
+            if (numI == 0)
+                continue;
+
+            String seriesInstanceUID = perfSeries.getString(Tag.SeriesInstanceUID);
+            @SuppressWarnings("unchecked")
+            List<SOPInstanceReference> storedSeries =
+                em.createNamedQuery(
+                        Instance.SOP_INSTANCE_REFERENCE_BY_SERIES_INSTANCE_UID)
+                  .setParameter(1, seriesInstanceUID)
+                  .getResultList();
+            if (storedSeries.isEmpty())
+                continue;
+
+            String studyInstanceUID = storedSeries.get(0).studyInstanceUID;
+            Attributes ian = findByStudyInstanceUID(ians, studyInstanceUID);
+            if (ian == null) {
+                ian = new Attributes(3);
+                Attributes refPPS = new Attributes(3);
+                ian.newSequence(Tag.ReferencedPerformedProcedureStepSequence, 1).add(refPPS);
+                refPPS.setString(Tag.ReferencedSOPClassUID, VR.UI,
+                        UID.ModalityPerformedProcedureStepSOPClass);
+                refPPS.setString(Tag.ReferencedSOPInstanceUID, VR.UI,
+                        ppsInstanceUID);
+                refPPS.setNull(Tag.PerformedWorkitemCodeSequence, VR.SQ);
+                ian.newSequence(Tag.ReferencedSeriesSequence, numS);
+                ian.setString(Tag.StudyInstanceUID, VR.UI, studyInstanceUID);
+                ians.add(ian);
+            }
+
+            Attributes refSeries = new Attributes(2);
+            ian.getSequence(Tag.ReferencedSeriesSequence).add(refSeries);
+            Sequence ianRefs = refSeries.newSequence(Tag.ReferencedSOPSequence, numI);
+            checkInstanceAvailability(ppsInstanceUID, refImgs, storedSeries, ianRefs);
+            checkInstanceAvailability(ppsInstanceUID, refNonImgs, storedSeries, ianRefs);
+            refSeries.setString(Tag.SeriesInstanceUID, VR.UI, seriesInstanceUID);
+        }
+        return ians;
+    }
+
+    private Attributes findByStudyInstanceUID(List<Attributes> list,
+            String studyInstanceUID) {
+        for (Attributes ian : list)
+            if (ian.getString(Tag.StudyInstanceUID).equals(studyInstanceUID))
+                return ian;
+
+        return null;
+    }
+
+    private void checkInstanceAvailability(String ppsInstanceUID,
+            Sequence ppsRefs, List<SOPInstanceReference> storedSeries,
+            Sequence ianRefs) throws SOPClassMismatchException {
+        if (ppsRefs == null)
+            return;
+
+        for (Attributes ppsRef : ppsRefs) {
+            SOPInstanceReference storedInst = findBySOPInstanceUID(storedSeries,
+                    ppsRef.getString(Tag.ReferencedSOPInstanceUID));
+            if (storedInst == null)
+                continue;
+
+            String cuid = ppsRef.getString(Tag.ReferencedSOPClassUID);
+            if (!storedInst.sopClassUID.equals(cuid))
+                throw new SOPClassMismatchException(
+                        "SOP Class of stored Instance[iuid=" 
+                        + storedInst.sopInstanceUID 
+                        + ", cuid=" + storedInst.sopClassUID
+                        + "] mismatch with SOP Reference[iuid=" 
+                        + storedInst.sopInstanceUID + ", cuid=" + cuid
+                        + "] in MPPS[uid=" + ppsInstanceUID + "]");
+
+            Attributes ianRef = new Attributes(4);
+            Utils.setRetrieveAET(ianRef,
+                    storedInst.retrieveAETs, storedInst.externalRetrieveAET);
+            ianRef.setString(Tag.InstanceAvailability, VR.CS,
+                    storedInst.availability.toCodeString());
+            ianRef.setString(Tag.ReferencedSOPClassUID, VR.UI,
+                    storedInst.sopClassUID);
+            ianRef.setString(Tag.ReferencedSOPInstanceUID, VR.UI,
+                    storedInst.sopInstanceUID);
+            ianRefs.add(ianRef);
+        }
+    }
+
+    private SOPInstanceReference findBySOPInstanceUID(
+            List<SOPInstanceReference> storedSOPs, String iuid) {
+        for (SOPInstanceReference sopRef : storedSOPs)
+            if (sopRef.sopInstanceUID.equals(iuid))
+                return sopRef;
+        return null;
     }
 
 }

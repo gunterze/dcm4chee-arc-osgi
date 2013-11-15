@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @author Umberto Cappellini <umberto.cappellini@agfa.com>
  *
  */
-@Path("/archive")
+@Path("/")
 public class ArchiveServiceRS 
 {
     private static final Logger LOG = LoggerFactory.getLogger(ArchiveServiceRS.class);

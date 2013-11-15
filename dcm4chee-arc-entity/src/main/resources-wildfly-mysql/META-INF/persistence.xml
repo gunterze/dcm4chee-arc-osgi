@@ -7,7 +7,7 @@
     <jta-data-source>${ds}</jta-data-source>
     <mapping-file>META-INF/orm.xml</mapping-file>
     <properties>
-      <property name="hibernate.dialect" value="org.dcm4chee.archive.entity.dialect.PatchedMySQL5InnoDBDialect />
+      <property name="hibernate.dialect" value="org.dcm4chee.archive.entity.dialect.PatchedMySQL5InnoDBDialect" />
       <property name="hibernate.hbm2ddl.auto" value="${hbm2ddl.auto}" />
       <property name="hibernate.show_sql" value="${show_sql}" />
       <property name="hibernate.jdbc.use_get_generated_keys" value="true" />

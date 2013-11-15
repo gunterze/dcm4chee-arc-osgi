@@ -164,6 +164,7 @@
     <module>dcm4chee-arc-retrieve</module>
     <module>dcm4chee-arc-retrieve-scp</module>
     <module>dcm4chee-arc-rs-control</module>
+    <module>dcm4chee-arc-rs-registrar</module>
     <module>dcm4chee-arc-series</module>
     <module>dcm4chee-arc-stgcmt</module>
     <module>dcm4chee-arc-stgcmt-scp</module>

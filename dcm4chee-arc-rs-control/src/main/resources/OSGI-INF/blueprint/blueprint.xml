@@ -12,7 +12,7 @@
     'http://localhost:8181/cxf/dcm4che/archive' -->
   <jaxrs:server
     id="archiveService"
-    address="/dcm4che">
+    address="/dcm4chee-rs">
     <jaxrs:serviceBeans>
       <ref component-id="archiveRESTService" />
     </jaxrs:serviceBeans>

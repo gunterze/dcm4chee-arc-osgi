@@ -1,0 +1,28 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+  <ext:property-placeholder />
+
+  <service
+    id="jmsService"
+    interface="org.dcm4chee.archive.jms.JmsService"
+    ref="jmsServiceImpl" />
+
+  <bean
+    id="jmsServiceImpl"
+    class="org.dcm4chee.archive.jms.impl.JmsServiceImpl"
+    init-method="init"
+    destroy-method="destroy">
+    <property
+      name="connectionFactory"
+      ref="hornetqConnectionFactory" />
+  </bean>
+
+  <bean
+    id="hornetqConnectionFactory"
+    class="org.dcm4chee.archive.jms.factory.JmsConnectionFactory"
+    factory-method="createFactory" />
+
+</blueprint>

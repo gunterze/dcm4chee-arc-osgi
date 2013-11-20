@@ -1,0 +1,50 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+  <ext:property-placeholder />
+
+  <!-- no need to expose InitialContextFactory service in WildFly, as is already
+       done by Jboss OSGi
+  <service
+    id="icf"
+    interface="javax.naming.spi.InitialContextFactory">
+    <bean class="org.apache.activemq.jndi.ActiveMQInitialContextFactory" />
+  </service>
+  -->
+
+  <service
+    id="jmsService"
+    interface="org.dcm4chee.archive.jms.JmsService"
+    ref="jmsServiceImpl" />
+
+  <bean
+    id="jmsServiceImpl"
+    class="org.dcm4chee.archive.jms.impl.JmsServiceImpl"
+    init-method="init"
+    destroy-method="destroy">
+    <property
+      name="connectionFactory"
+      ref="connectionFactoryLookup" />
+    <property
+      name="specializer"
+      value="HORNETQ" />
+    <!-- in HornetQ we don't authenticate the connection creator   
+    <property
+      name="userName"
+      value="smx" />
+    <property
+      name="password"
+      value="smx" />
+    -->
+  </bean>
+
+  <bean
+    id="connectionFactoryLookup"
+    class="org.dcm4chee.archive.jms.factory.JmsConnectionFactory"
+    factory-method="createFactory">
+      <argument value="ConnectionFactory"/>
+    </bean>
+
+</blueprint>

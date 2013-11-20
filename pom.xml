@@ -11,9 +11,10 @@
     <slf4j.version>1.7.5</slf4j.version>
     <hibernate.version>4.2.7.Final</hibernate.version>
     <querydsl.version>3.2.3</querydsl.version>
-    <!--db>wildfly-mysql</db-->
+    <!--platform>wildfly</platform-->
     <!--ds>java:/PacsDS</ds-->
-    <db>karaf-mysql</db>
+    <platform>karaf</platform>
+    <db>mysql</db>
     <ds>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=PacsDS)</ds>
   </properties>
   <dependencyManagement>
@@ -171,7 +172,6 @@
     <module>dcm4chee-arc-stgcmt-scp</module>
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
-    <module>dcm4chee-arc-jms-wildfly</module>
   </modules>
   <build>
     <pluginManagement>

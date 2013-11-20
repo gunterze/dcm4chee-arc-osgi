@@ -38,6 +38,8 @@
 
 package org.dcm4chee.archive.jms.impl;
 
+import java.util.Enumeration;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -50,19 +52,39 @@ import org.dcm4chee.archive.jms.MessageCreator;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
+ * @author Umberto Cappellini <umberto.cappellini@agfa.com>
  *
  */
 public class JmsServiceImpl implements JmsService {
 
     private ConnectionFactory connectionFactory;
     private Connection conn;
+    private JmsSpecializer specializer;
+    private String userName = null;
+    private String password = null;
 
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
 
+    public void setSpecializer(JmsSpecializer specializer) {
+        this.specializer = specializer;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void init() throws JMSException {
-        conn = connectionFactory.createConnection();
+        
+        if (userName!=null && password!=null)
+            conn = connectionFactory.createConnection(userName,password);
+        else
+            conn = connectionFactory.createConnection();
     }
 
     public void destroy() throws JMSException {
@@ -86,9 +108,7 @@ public class JmsServiceImpl implements JmsService {
         Session session = createSession();
         try {
             Message message = messageCreator.createMessage(session);
-            if (delay > 0L) {
-                message.setLongProperty("AMQ_SCHEDULED_DELAY", delay);
-            }
+            specializer.setDelay(message, delay);
             session.createProducer(destination).send(message);
         } finally {
             session.close();

@@ -18,7 +18,7 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources-${db}</directory>
+        <directory>src/main/resources-${platform}-${db}</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -56,7 +56,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-          <classifier>${db}</classifier>
+          <classifier>${platform}-${db}</classifier>
           <instructions>
             <Import-Package>*,javassist.util.proxy,org.hibernate.proxy</Import-Package>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>

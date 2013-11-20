@@ -13,6 +13,7 @@
     <bean class="org.apache.activemq.jndi.ActiveMQInitialContextFactory" />
   </service>
 
+  <!-- service exposed to any bundle using JMS queues -->
   <service
     id="jmsService"
     interface="org.dcm4chee.archive.jms.JmsService"
@@ -37,6 +38,7 @@
       value="smx" />
   </bean>
 
+  <!-- factory to lookup in the jndi registry for a jms ConnectionFactory -->
   <bean
     id="connectionFactoryLookup"
     class="org.dcm4chee.archive.jms.factory.JmsConnectionFactory"

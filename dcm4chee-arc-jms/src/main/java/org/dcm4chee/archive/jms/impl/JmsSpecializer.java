@@ -43,6 +43,9 @@ import javax.jms.Message;
 
 /**
  * @author Umberto Cappellini <umberto.cappellini@agfa.com>
+ * 
+ * Enumeration to specialize the setting of the delay for message delivery,
+ * according to the underlying JMS framework.
  *
  */
 public enum JmsSpecializer {

@@ -53,7 +53,12 @@ import org.dcm4chee.archive.jms.MessageCreator;
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  * @author Umberto Cappellini <umberto.cappellini@agfa.com>
- *
+ * 
+ *         Implementation of the OSGi JMS Service. Through blueprint are
+ *         injected the jms connection factory, a jms specializer used to set a
+ *         delay in the message delivery, and user/pass to create a jms
+ *         connection (if needed). If user/pass are not injected, the connection
+ *         is created anonymously. 
  */
 public class JmsServiceImpl implements JmsService {
 
@@ -80,9 +85,9 @@ public class JmsServiceImpl implements JmsService {
     }
 
     public void init() throws JMSException {
-        
-        if (userName!=null && password!=null)
-            conn = connectionFactory.createConnection(userName,password);
+
+        if (userName != null && password != null)
+            conn = connectionFactory.createConnection(userName, password);
         else
             conn = connectionFactory.createConnection();
     }

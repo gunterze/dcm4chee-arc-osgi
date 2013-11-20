@@ -44,12 +44,20 @@ import javax.naming.InitialContext;
 /**
  * @author Umberto Cappellini <umberto.cappellini@agfa.com>
  * 
+ *         Bean factory used to create a JMS ConnectionFactory to be injected in
+ *         the jmsServiceImpl.
+ * 
+ *         The connection factory is retrieved via JNDI lookup. In some
+ *         platforms the jms connection factory may be already available as an
+ *         OSGi service, but for the sake of uniformity jndi lookup is used in
+ *         all cases.
  */
 public class JmsConnectionFactory {
 
-    public static ConnectionFactory createFactory(String jndiName) throws Exception{
+    public static ConnectionFactory createFactory(String jndiName)
+            throws Exception {
         InitialContext ctx = new InitialContext();
-        ConnectionFactory cf = (ConnectionFactory)ctx.lookup(jndiName);
+        ConnectionFactory cf = (ConnectionFactory) ctx.lookup(jndiName);
         return cf;
     }
 

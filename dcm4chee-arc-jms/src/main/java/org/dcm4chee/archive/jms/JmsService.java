@@ -45,7 +45,9 @@ import javax.jms.Session;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
- *
+ * 
+ * OSGi service exposed to any bundle using JMS queues
+ * 
  */
 public interface JmsService {
 

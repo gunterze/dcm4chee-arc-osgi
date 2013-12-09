@@ -1,0 +1,22 @@
+<blueprint
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+  xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0">
+
+  <bean
+    id="patientServiceTest"
+    class="org.dcm4chee.archive.test.patient.PatientServiceTest"
+    activation="eager"
+    init-method="init"
+    destroy-method="destroy">
+    <property
+      name="patientService"
+      ref="patientService" />
+  </bean>
+
+  <reference
+    id="patientService"
+    interface="org.dcm4chee.archive.patient.PatientService" />
+    
+</blueprint>

@@ -65,6 +65,13 @@ import org.dcm4chee.archive.patient.PatientService;
  */
 public class PatientServiceImpl implements PatientService {
 
+    private static final String NULL_MERGE_FK = "update Patient p set p.mergedWith=NULL "
+            + "where p.patientID like 'PATIENT_SERVICE_TEST-%'";
+    private static final String CLEAR_PATIENTS = "delete from Patient p "
+            + "where p.patientID like 'PATIENT_SERVICE_TEST-%'";
+    private static final String CLEAR_ISSUERS = "delete from Issuer i "
+            + "where i.localNamespaceEntityID like 'PATIENT_SERVICE_TEST-%'";
+    
     private EntityManager em;
     private IssuerService issuerService;
 
@@ -189,6 +196,16 @@ public class PatientServiceImpl implements PatientService {
         if (list.size() > 1)
             throw new NonUniqueResultException();
         return list.get(0);
+    }
+    
+    public void clearData()  {
+        try {
+            em.createQuery(NULL_MERGE_FK).executeUpdate();
+            em.createQuery(CLEAR_PATIENTS).executeUpdate();
+            em.createQuery(CLEAR_ISSUERS).executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

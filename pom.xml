@@ -172,6 +172,7 @@
     <module>dcm4chee-arc-stgcmt-scp</module>
     <module>dcm4chee-arc-store</module>
     <module>dcm4chee-arc-store-scp</module>
+    <module>dcm4chee-arc-test</module>
   </modules>
   <build>
     <pluginManagement>

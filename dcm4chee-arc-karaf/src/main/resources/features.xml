@@ -4,7 +4,7 @@
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-compress/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-conf-ldap/${project.version}</bundle>
-    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-entity/${project.version}/jar/${db}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-entity/${project.version}/jar/${platform}-${db}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-code/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-issuer/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-patient/${project.version}</bundle>
@@ -16,7 +16,7 @@
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-query-common/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-query/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-retrieve/${project.version}</bundle>
-    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-jms/${project.version}</bundle>
+    <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-jms/${project.version}/jar/${platform}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-device/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-ian-scu/${project.version}</bundle>
     <bundle>mvn:org.dcm4che.dcm4chee-arc/dcm4chee-arc-mpps-scu/${project.version}</bundle>

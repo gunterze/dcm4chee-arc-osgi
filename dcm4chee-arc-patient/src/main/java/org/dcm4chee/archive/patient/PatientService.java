@@ -52,5 +52,6 @@ public interface PatientService {
     Patient findUniqueOrCreatePatient(
             AttributeFilter filter, FuzzyStr fuzzyStr,
             Attributes data, boolean followMergedWith, boolean mergeAttributes);
-
+    
+    public void clearData();
 }
